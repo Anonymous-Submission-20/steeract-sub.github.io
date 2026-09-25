@@ -506,6 +506,10 @@
     .presentation-video { max-width:100%; }
     .presentation-video .section-heading { margin-bottom:20px; }
     .presentation-video video { display:block; width:100%; aspect-ratio:16/9; background:#111; border-radius:8px; }
+    .code-release { margin-top:clamp(36px,6vw,72px); padding:32px 0 10px; border-top:1px solid var(--line); text-align:center; }
+    .code-release h2 { margin:0 0 16px; font-size:clamp(1.5rem,3vw,2rem); line-height:1.2; }
+    .code-release .resource { min-height:44px; color:#fff; border-color:var(--teal); background:var(--teal); font-weight:650; }
+    .code-release .resource:hover { color:#fff; background:var(--ink); border-color:var(--ink); }
     #mechanism .chart-grid { grid-template-rows:280px 42px 42px 70px 26px; }
     #mechanism .trace-container { height:280px; }
     #mechanism .trace-line { stroke-width:2.5; }
@@ -649,6 +653,13 @@
         <p class="mechanism-note">Feature curves and the shaded reference band are illustrative, not measured activation distributions. The method compares temporal descriptors with fixed success and failure banks; the shaded band is not the bank itself.</p>
         <p class="sr-only" id="sync-status" role="status" aria-live="polite"></p>
         <p class="sr-only" id="playback-announcement" role="status" aria-live="polite"></p>
+      </section>
+      <section class="code-release" id="code" aria-labelledby="code-title">
+        <h2 id="code-title">Code</h2>
+        <a class="resource" href="code-2.zip" download="code-2.zip">
+          <svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/></svg>
+          Download Code (ZIP)
+        </a>
       </section>
     </main>
     <footer><span>SteerAct · Few-shot temporal steering</span><span>Method and reported results follow the authors’ V5 manuscript.</span></footer>
