@@ -1,0 +1,885 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SteerAct: gated, single-feature steering for frozen robot policies. Explore real-robot comparisons, the video gallery, and the intervention mechanism.">
+  <meta name="color-scheme" content="light">
+  <title>SteerAct — Steering Frozen Robot Policies</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230B746A'/%3E%3Cpath d='M6 20h6l4-10 4 13 3-7h3' fill='none' stroke='white' stroke-width='2.5'/%3E%3C/svg%3E">
+  <style>
+    :root { --paper:#fafaf7; --ink:#152b29; --muted:#5c696a; --teal:#0b746a; --teal-dark:#07584f; --teal-light:#e8f3ee; --line:#d9dfda; --quiet:#eff1ed; --clay:#a8583d; --white:#fff; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; scroll-padding-top:2rem; }
+    body { margin:0; color:var(--ink); background:var(--paper); font-family:Inter,Arial,Helvetica,sans-serif; font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased; }
+    button,input { font:inherit; }
+    button,a,input,summary { -webkit-tap-highlight-color:transparent; }
+    button { cursor:pointer; }
+    button:disabled { cursor:not-allowed; }
+    a { color:inherit; text-decoration:none; }
+    a:hover { color:var(--teal); }
+    :focus-visible { outline:3px solid var(--teal); outline-offset:5px; }
+    ::selection { background:#cbe6dc; }
+    .wrap { width:min(1160px,calc(100% - 80px)); margin-inline:auto; }
+    .skip { position:fixed; top:-90px; left:20px; padding:12px 18px; background:var(--ink); color:white; z-index:10; }
+    .skip:focus { top:12px; color:white; }
+    .masthead { display:flex; justify-content:space-between; align-items:center; gap:24px; min-height:88px; border-bottom:1px solid var(--line); }
+    .wordmark { display:inline-flex; gap:10px; align-items:center; font-size:24px; font-weight:750; letter-spacing:-1px; }
+    .brand-mark { width:25px; height:25px; color:var(--teal); }
+    .nav { display:flex; align-items:center; gap:30px; font-size:14px; }
+    .nav .preview { border-left:1px solid var(--line); padding-left:24px; color:var(--muted); font-size:12px; letter-spacing:.08em; text-transform:uppercase; }
+    .hero { padding-top:62px; text-align:center; }
+    .eyebrow { font-size:12px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--teal); margin:0 0 20px; }
+    h1 { font-size:clamp(2.5rem,4.65vw,4rem); line-height:1.08; font-weight:650; letter-spacing:-.047em; margin:0 auto 24px; max-width:1080px; text-wrap:balance; }
+    h1 .line { display:block; }
+    h1 em { color:var(--teal); font-style:normal; }
+    .lead { margin:0 auto; color:var(--muted); font-size:18px; line-height:1.65; max-width:760px; text-wrap:balance; }
+    .resources { display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin:25px 0 40px; }
+    .resource { display:inline-flex; gap:8px; align-items:center; border:1px solid var(--line); border-radius:999px; padding:10px 17px; color:#647171; background:transparent; font-size:14px; }
+    .resource small { color:#667271; font-size:12px; border-left:1px solid #cbd3cd; padding-left:8px; }
+    .icon { width:17px; height:17px; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
+    .comparison { display:grid; grid-template-columns:1fr 1fr; gap:22px; text-align:left; }
+    .video-card { margin:0; min-width:0; }
+    .video-caption { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:0 0 11px; }
+    .video-title { display:flex; align-items:center; gap:10px; font-weight:650; font-size:16px; }
+    .video-title .number { color:#778180; font-weight:400; font-size:12px; font-variant-numeric:tabular-nums; }
+    .video-card.ours .video-title { color:var(--teal); }
+    .video-status { font-size:12px; color:var(--muted); }
+    .video-placeholder { aspect-ratio:16/8.1; min-height:160px; border:1px solid var(--line); background:#ecefeb; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; position:relative; }
+    .video-card.ours .video-placeholder { background:#eaf0ec; border-color:#c6d8ce; }
+    .frame-icon { width:44px; height:36px; stroke:#6d7975; fill:none; stroke-width:1.2; }
+    .video-card.ours .frame-icon { stroke:var(--teal); }
+    .placeholder-label { color:#52615d; font-size:14px; margin:0; }
+    .slot-label { position:absolute; bottom:12px; left:15px; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:#64716b; }
+    .caption-note { color:var(--muted); font-size:12px; text-align:center; margin:13px 0 0; }
+    .facts { margin:31px auto 0; max-width:900px; display:grid; grid-template-columns:repeat(3,1fr); }
+    .fact { padding:0 24px; }
+    .fact + .fact { border-left:1px solid var(--line); }
+    .fact strong { display:block; color:var(--teal); font-size:46px; font-weight:550; line-height:1.1; letter-spacing:-.035em; }
+    .fact span { display:block; margin-top:9px; font-size:14px; color:#455450; }
+    .budget-note { margin:17px 0 0; color:var(--muted); font-size:12px; }
+    .section { margin-top:65px; padding-top:47px; border-top:1px solid var(--line); }
+    .section .eyebrow { margin-bottom:12px; }
+    .section h2 { font-size:clamp(1.9rem,3.2vw,2.8rem); font-weight:600; letter-spacing:-.04em; line-height:1.16; margin:0 0 13px; text-wrap:balance; }
+    .section-lead { color:var(--muted); max-width:790px; margin:0; font-size:17px; }
+    .explanation-head { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; margin-bottom:26px; }
+    .demo-disclosure { display:inline-flex; align-items:center; gap:7px; font-size:12px; font-weight:650; letter-spacing:.04em; text-transform:uppercase; background:#faf1e4; color:#83530b; border:1px solid #e5d0ac; padding:7px 10px; border-radius:3px; margin:18px 0 0; }
+    .mechanism-grid { display:grid; grid-template-columns:minmax(0,1fr) 270px; gap:18px; align-items:stretch; }
+    .chart-panel { min-width:0; padding:24px 24px 14px; border:1px solid var(--line); border-radius:5px; background:var(--white); }
+    .chart-title { display:flex; gap:12px; justify-content:space-between; align-items:center; margin-bottom:20px; }
+    .chart-title h3 { margin:0; font-size:14px; font-weight:650; }
+    .chart-title span { font-size:12px; color:var(--muted); }
+    .chart-grid { display:grid; grid-template-columns:142px minmax(0,1fr); grid-template-rows:150px 42px 42px 70px 26px; align-items:center; position:relative; }
+    .row-label { font-size:14px; line-height:1.4; color:#43514e; padding-right:16px; }
+    .row-label small { display:block; font-size:12px; color:#68756f; margin-top:4px; }
+    .trace-container { height:150px; border-bottom:1px solid #dce3de; position:relative; align-self:stretch; }
+    .trace-svg,.correction-svg { width:100%; height:100%; display:block; overflow:visible; }
+    .trace-svg .grid-line { stroke:#edf0ed; stroke-width:1; vector-effect:non-scaling-stroke; }
+    .trace-line { fill:none; stroke:var(--teal); stroke-width:2; vector-effect:non-scaling-stroke; stroke-linecap:round; stroke-linejoin:round; }
+    .trace-full { opacity:.2; }
+    .track { height:13px; position:relative; background:#e9edeb; border-radius:2px; overflow:hidden; }
+    .segment { position:absolute; height:100%; top:0; background:#62aaa0; }
+    .track.outcome .segment { background:var(--teal); }
+    .correction-container { height:70px; }
+    .axis { display:flex; justify-content:space-between; font-size:12px; color:#69736f; position:relative; }
+    .axis-label { position:absolute; inset:0; text-align:center; pointer-events:none; }
+    .cursor-layer { position:absolute; left:142px; right:0; top:0; bottom:26px; pointer-events:none; }
+    .cursor { position:absolute; top:0; bottom:0; width:0; border-left:1px dashed #6f8078; }
+    .cursor-dot { width:9px; height:9px; border-radius:50%; background:var(--teal); border:2px solid white; position:absolute; transform:translate(-50%,-50%); box-shadow:0 0 0 1px var(--teal); }
+    .timeline-note { font-size:12px; color:var(--muted); margin:14px 0 0 142px; }
+    .state-panel { background:#f0f5ef; border:1px solid #d6e1d6; border-radius:5px; padding:23px 22px; min-width:0; }
+    .state-heading { display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+    .state-heading h3 { font-size:20px; margin:0; font-weight:600; letter-spacing:-.02em; }
+    .step { color:var(--teal); font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:12px; white-space:nowrap; }
+    .state-list { margin:18px 0 0; }
+    .state-row { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:12px 0; border-top:1px solid #d6e1d6; }
+    .state-row dt { color:#52645a; font-size:14px; }
+    .state-row dd { margin:0; color:var(--teal); font-size:14px; font-weight:600; }
+    .state-row dd.closed { color:#67706b; }
+    .alpha-box { border-top:1px solid #d6e1d6; padding-top:16px; margin-top:2px; display:flex; align-items:baseline; justify-content:space-between; gap:12px; }
+    .alpha-label { font-size:12px; color:#52645a; }
+    #alpha-value { font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:25px; letter-spacing:-1px; color:var(--teal); }
+    .state-message { font-size:16px; color:#4b6056; min-height:50px; margin:10px 0 0; }
+    .state-footnote { font-size:12px; color:#52645a; margin:17px 0 0; padding-top:14px; border-top:1px solid #d6e1d6; line-height:1.55; }
+    .controls { display:grid; grid-template-columns:auto auto minmax(140px,1fr) auto; gap:17px; align-items:center; padding:19px 0; }
+    .play-button { min-width:101px; min-height:44px; padding:9px 16px; background:var(--teal); color:white; border:1px solid var(--teal); border-radius:4px; display:flex; justify-content:center; align-items:center; gap:9px; font-size:14px; }
+    .play-button:hover { background:var(--teal-dark); }
+    .play-icon { width:12px; height:12px; fill:currentColor; }
+    .replay { border:1px solid var(--line); background:transparent; color:#52645a; display:flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:4px; }
+    .replay:hover { background:var(--quiet); }
+    .slider-wrap { display:flex; align-items:center; gap:14px; min-width:0; }
+    input[type="range"] { -webkit-appearance:none; appearance:none; width:100%; height:5px; border-radius:3px; background:linear-gradient(to right,var(--teal) 54.16%,#dce3dd 54.16%); cursor:pointer; margin:18px 0; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:var(--teal); border:3px solid var(--paper); box-shadow:0 0 0 1px var(--teal); }
+    input[type="range"]::-moz-range-thumb { width:11px; height:11px; border-radius:50%; background:var(--teal); border:3px solid var(--paper); box-shadow:0 0 0 1px var(--teal); }
+    .frame-readout { font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; }
+    .control-caption { font-size:12px; color:var(--muted); margin:0; }
+    .mechanism-caption { border-top:1px solid var(--line); padding:14px 0 0; margin:0; color:var(--muted); font-size:13px; line-height:1.65; }
+    .mechanism-caption strong { color:#3e534b; font-weight:600; }
+    details { margin-top:20px; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:16px 0; }
+    summary { font-size:14px; font-weight:600; cursor:pointer; width:fit-content; }
+    .method-notes { display:grid; grid-template-columns:repeat(3,1fr); gap:30px; margin-top:18px; }
+    .method-notes h4 { font-size:14px; margin:0 0 6px; color:var(--teal); }
+    .method-notes p { margin:0; font-size:16px; color:var(--muted); }
+    footer { display:flex; justify-content:space-between; gap:20px; padding:35px 0; margin-top:22px; color:var(--muted); font-size:12px; }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    noscript p { padding:16px; border:1px solid #e5d0ac; background:#faf1e4; }
+    [hidden] { display:none !important; }
+    .hero { padding-top:56px; }
+    .hero > .eyebrow { display:inline-block; padding:7px 13px; border:1px solid #c9ded4; border-radius:999px; background:var(--teal-light); font-size:12px; letter-spacing:.1em; }
+    .hero .lead { max-width:780px; }
+    .hero .resources { margin-bottom:35px; }
+    .resource.primary { background:var(--teal); border-color:var(--teal); color:white; }
+    .resource.primary:hover { background:var(--teal-dark); }
+    .score-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); text-align:left; margin-top:35px; border:1px solid #163f36; border-radius:12px; overflow:hidden; background:#123b32; color:#eef8f3; box-shadow:0 12px 30px #123b3210; }
+    .score-card { padding:29px 25px 27px; }
+    .score-card + .score-card { border-left:1px solid #396052; }
+    .score-card .setting { margin:0 0 22px; color:#c0d7ca; font-size:13px; }
+    .score-card .setting b { display:block; color:#f3fbf7; font-size:16px; font-weight:600; margin-bottom:4px; }
+    .gain { display:block; font-size:48px; line-height:1; letter-spacing:-.04em; color:#bdeed1; font-weight:600; font-variant-numeric:tabular-nums; }
+    .gain small { font-size:17px; letter-spacing:0; font-weight:500; }
+    .score-transition { font-size:16px; margin:14px 0 5px; font-variant-numeric:tabular-nums; }
+    .score-transition .arrow { color:#abc8b9; margin:0 6px; }
+    .score-transition strong { color:#fff; }
+    .score-caption { font-size:12px; color:#c0d7ca; }
+    .evidence-note { color:var(--muted); font-size:13px; line-height:1.6; margin:17px 0 0; }
+    .protocol-strip { margin:30px 0 0; padding:20px 0; border-block:1px solid var(--line); display:flex; align-items:center; justify-content:center; gap:46px; text-align:left; }
+    .protocol-strip div { display:flex; align-items:center; gap:12px; font-size:13px; color:var(--muted); line-height:1.4; }
+    .protocol-strip strong { color:var(--ink); font-size:30px; font-weight:550; letter-spacing:-.04em; }
+    .section-heading { display:flex; justify-content:space-between; gap:26px; align-items:flex-end; margin-bottom:28px; }
+    .section-index { color:#a7b4ad; font-size:50px; line-height:1; font-weight:400; letter-spacing:-.04em; }
+    .robot-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; }
+    .robot-case { min-width:0; padding:24px; background:white; border:1px solid var(--line); border-radius:10px; }
+    .robot-case:first-child { grid-column:1/-1; padding:30px; border-color:#a6c7b6; border-top:4px solid var(--teal); }
+    .robot-case:first-child .case-head h3 { font-size:30px; }
+    .robot-case:first-child .gain-pill { font-size:22px; padding:10px 17px; }
+    .robot-case:not(:first-child) .comparison { gap:17px; }
+    .robot-case:not(:first-child) .video-caption { flex-wrap:wrap; gap:3px 8px; }
+    .robot-case:not(:first-child) .video-title { font-size:14px; }
+    .robot-case:not(:first-child) .video-stat { flex-wrap:wrap; gap:3px 12px; }
+    .case-head { display:flex; justify-content:space-between; gap:22px; align-items:center; margin-bottom:21px; }
+    .case-head h3 { font-size:24px; font-weight:550; letter-spacing:-.03em; margin:0 0 3px; }
+    .case-head p { margin:0; color:var(--muted); font-size:13px; }
+    .gain-pill { color:var(--teal); background:var(--teal-light); border:1px solid #d0e4d8; border-radius:999px; font-size:16px; font-weight:600; padding:8px 14px; white-space:nowrap; font-variant-numeric:tabular-nums; }
+    .media-box { min-width:0; aspect-ratio:16/9; display:grid; place-content:center; text-align:center; gap:8px; position:relative; overflow:hidden; background:#eef1ed; border:1px solid #d9e1da; border-radius:4px; }
+    .ours .media-box { background:#e9f2ed; border-color:#c6dbce; }
+    .media-box::before,.media-box::after { content:''; position:absolute; width:20px; height:20px; border-color:#bcc9bf; border-style:solid; pointer-events:none; }
+    .media-box::before { top:14px; left:14px; border-width:1px 0 0 1px; }
+    .media-box::after { bottom:14px; right:14px; border-width:0 1px 1px 0; }
+    .media-box .frame-icon { margin:0 auto; opacity:.7; }
+    .media-box strong { color:#52655b; font-size:14px; font-weight:500; }
+    .media-box small { color:#65786a; font-size:12px; }
+    .media-box video { width:100%; height:100%; object-fit:contain; position:absolute; inset:0; background:#13251e; }
+    .video-stat { margin:0; padding-top:13px; display:flex; justify-content:space-between; align-items:baseline; gap:16px; font-size:13px; color:var(--muted); }
+    .video-stat strong { font-size:28px; letter-spacing:-.04em; font-weight:550; color:var(--ink); }
+    .ours .video-stat strong { color:var(--teal); }
+    .video-stat strong small { font-size:15px; }
+    .partial-note { padding:16px 19px; background:#f1f2ed; border-left:3px solid #b2c6b7; font-size:13px; color:#536458; margin-top:20px; }
+    .performance-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+    .benchmark-card { background:white; border:1px solid var(--line); padding:26px; border-radius:8px; }
+    .benchmark-top { display:flex; justify-content:space-between; align-items:flex-start; gap:20px; margin-bottom:22px; }
+    .benchmark-top h3 { margin:0 0 4px; font-size:20px; font-weight:550; letter-spacing:-.02em; }
+    .benchmark-top p { margin:0; color:var(--muted); font-size:13px; }
+    .benchmark-top .gain-pill { font-size:14px; padding:6px 11px; }
+    .bar-row { display:grid; grid-template-columns:120px minmax(0,1fr) 40px; gap:12px; align-items:center; padding:10px 0; font-size:14px; }
+    .bar-label { overflow-wrap:anywhere; }
+    .bar-track { height:15px; border-radius:2px; background:#f0f2ef; overflow:hidden; }
+    .bar-fill { height:100%; background:#adbbb2; border-radius:2px; }
+    .bar-row.ours { font-weight:650; color:var(--teal); background:#e9f3ed; outline:6px solid #e9f3ed; border-radius:2px; margin-block:8px; }
+    .bar-row.ours .bar-fill { background:var(--teal); }
+    .bar-row.base .bar-fill { background:#64756d; }
+    .bar-value { text-align:right; font-variant-numeric:tabular-nums; }
+    .scale { margin-left:132px; margin-right:52px; display:flex; justify-content:space-between; font-size:12px; color:#66776c; padding-top:10px; border-top:1px solid var(--line); }
+    .table-scroll { overflow:auto; margin-top:16px; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th,td { padding:12px 14px; text-align:right; border-bottom:1px solid var(--line); white-space:nowrap; font-variant-numeric:tabular-nums; }
+    th { font-weight:600; color:#42594c; }
+    th:first-child,td:first-child { text-align:left; }
+    td:last-child,th:last-child { background:#e9f2eb; color:var(--teal); }
+    .filter-row { display:flex; flex-wrap:wrap; align-items:center; gap:9px; margin:26px 0 22px; }
+    .filter { border:1px solid var(--line); border-radius:999px; color:var(--muted); background:transparent; padding:10px 17px; font-size:14px; min-height:44px; }
+    .filter[aria-pressed="true"] { color:white; background:var(--teal); border-color:var(--teal); }
+    .gallery-count { margin-left:auto; font-size:13px; color:var(--muted); }
+    .gallery-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:24px 18px; }
+    .gallery-card { min-width:0; background:white; border:1px solid var(--line); border-radius:8px; padding:12px 12px 17px; }
+    .gallery-card .media-box { aspect-ratio:4/3; border-radius:4px; }
+    .gallery-meta { margin:14px 0 7px; color:var(--teal); font-size:12px; letter-spacing:0; }
+    .gallery-card h3 { font-size:17px; line-height:1.3; font-weight:600; letter-spacing:-.02em; margin:0; }
+    .gallery-score { margin:12px 0 0; padding-top:10px; border-top:1px solid var(--line); font-size:14px; color:var(--muted); }
+    .gallery-score strong { color:var(--teal); }
+    .method-intro { padding:25px; border:1px solid var(--line); background:white; border-radius:6px; margin-bottom:25px; font-size:19px; line-height:1.65; max-width:100%; }
+    .method-intro strong { color:var(--teal); font-weight:550; }
+    .closing { margin-top:54px; padding:34px; border-radius:8px; background:#e8f1eb; display:flex; align-items:center; justify-content:space-between; gap:30px; }
+    .closing h2 { font-size:27px; margin:0 0 8px; font-weight:550; letter-spacing:-.03em; }
+    .closing p { margin:0; color:var(--muted); max-width:660px; font-size:15px; }
+    .closing a { white-space:nowrap; color:var(--teal); font-weight:600; }
+    @media (max-width:1000px) {
+      .score-grid,.gallery-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .score-card:nth-child(3) { border-left:0; }
+      .score-card:nth-child(n+3) { border-top:1px solid #396052; }
+      .robot-list { grid-template-columns:minmax(0,1fr); }
+      .nav { gap:20px; }
+      .nav .preview { display:none; }
+    }
+    @media (max-width:640px) {
+      .masthead { flex-wrap:wrap; padding-block:17px; gap:12px; }
+      .nav { width:100%; justify-content:space-between; font-size:13px; gap:10px; }
+      .hero { padding-top:35px; }
+      .score-card { padding:19px 16px; }
+      .score-card .setting { font-size:12px; margin-bottom:14px; }
+      .score-card .setting b { font-size:14px; }
+      .gain { font-size:34px; }
+      .gain small { font-size:14px; }
+      .score-transition { font-size:14px; }
+      .score-transition .arrow { margin:0 2px; }
+      .score-caption { font-size:12px; }
+      .protocol-strip { gap:17px; padding-block:18px; }
+      .protocol-strip div { flex-direction:column; align-items:flex-start; gap:4px; font-size:12px; }
+      .protocol-strip strong { font-size:28px; }
+      .section-heading { align-items:flex-start; gap:13px; }
+      .section-index { font-size:32px; }
+      .robot-case,.robot-case:first-child { padding:18px; }
+      .robot-case:first-child .case-head h3 { font-size:24px; }
+      .robot-case:first-child .gain-pill { font-size:16px; padding:8px 11px; }
+      .case-head { align-items:flex-start; gap:12px; }
+      .case-head h3 { font-size:22px; }
+      .gain-pill { padding:6px 10px; font-size:14px; }
+      .robot-case .comparison { gap:22px; }
+      .video-status { font-size:12px; }
+      .video-stat { padding-top:7px; }
+      .performance-grid { grid-template-columns:1fr; }
+      .benchmark-card { padding:20px 17px; }
+      .benchmark-top { gap:9px; }
+      .benchmark-top h3 { font-size:18px; }
+      .bar-row { grid-template-columns:114px minmax(0,1fr) 36px; gap:8px; font-size:14px; }
+      .scale { margin-left:122px; margin-right:44px; }
+      .gallery-grid { grid-template-columns:1fr 1fr; gap:25px 14px; }
+      .gallery-card h3 { font-size:15px; }
+      .gallery-card .media-box strong { font-size:12px; }
+      .gallery-card .media-box small { display:none; }
+      .gallery-card .frame-icon { width:29px; height:25px; }
+      .gallery-meta { font-size:12px; }
+      .gallery-score { font-size:14px; }
+      .gallery-count { width:100%; margin-top:3px; }
+      .method-intro { padding:20px; font-size:17px; }
+      .closing { padding:25px 22px; flex-direction:column; align-items:flex-start; }
+      .closing h2 { font-size:25px; }
+    }
+    @media (min-width:1400px) { .hero { padding-top:72px; } }
+    @media (max-width:1000px) {
+      .mechanism-grid { grid-template-columns:minmax(0,1fr); }
+      .state-panel { display:grid; grid-template-columns:1fr 1fr; gap:0 30px; }
+      .state-heading { grid-column:1/-1; }
+      .state-list { margin-top:15px; }
+      .state-detail { padding-top:15px; }
+      .state-footnote { margin-top:0; }
+      .control-caption { display:none; }
+      .controls { grid-template-columns:auto auto minmax(140px,1fr); }
+    }
+    @media (max-width:640px) {
+      .wrap { width:calc(100% - 36px); }
+      .masthead { min-height:72px; gap:16px; }
+      .wordmark { font-size:21px; }
+      .brand-mark { width:21px; height:21px; }
+      .nav { flex-wrap:wrap; gap:10px 16px; font-size:14px; }
+      .nav .preview { display:none; }
+      .hero { padding-top:42px; }
+      .eyebrow { font-size:12px; margin-bottom:17px; }
+      h1 { font-size:clamp(2.05rem,8.2vw,3.2rem); line-height:1.1; letter-spacing:-.044em; margin-bottom:19px; }
+      h1 .line { display:contents; }
+      .lead { font-size:16px; }
+      .resources { margin-top:23px; margin-bottom:31px; gap:7px; }
+      .resource { padding:9px 12px; font-size:14px; gap:6px; }
+      .resource small { font-size:12px; padding-left:6px; }
+      .comparison { grid-template-columns:1fr; gap:20px; }
+      .video-placeholder { aspect-ratio:16/8; }
+      .video-caption { padding-bottom:8px; }
+      .video-title { font-size:15px; }
+      .caption-note { font-size:12px; line-height:1.5; }
+      .facts { margin-top:28px; }
+      .fact { padding:0 9px; }
+      .fact strong { font-size:37px; }
+      .fact span { font-size:14px; line-height:1.5; }
+      .budget-note { font-size:12px; max-width:290px; margin-inline:auto; }
+      .section { margin-top:43px; padding-top:33px; }
+      .section h2 { font-size:30px; }
+      .section-lead { font-size:16px; }
+      .demo-disclosure { font-size:12px; padding:7px 8px; letter-spacing:0; }
+      .chart-panel { padding:17px 12px 13px; }
+      .chart-title { margin-bottom:16px; align-items:flex-start; }
+      .chart-title span { font-size:12px; }
+      .chart-title h3 { font-size:14px; max-width:150px; }
+      .chart-grid { grid-template-columns:104px minmax(0,1fr); grid-template-rows:130px 45px 45px 85px 26px; }
+      .trace-container { height:130px; }
+      .row-label { font-size:14px; padding-right:12px; }
+      .row-label small { font-size:12px; }
+      .cursor-layer { left:104px; }
+      .timeline-note { margin-left:104px; font-size:12px; }
+      .axis { font-size:12px; }
+      .axis-label { position:static; }
+      .state-panel { padding:18px; grid-template-columns:1fr; }
+      .state-detail { padding-top:0; }
+      .state-heading h3 { font-size:18px; }
+      .state-message { min-height:0; }
+      .state-footnote { margin-top:14px; }
+      .state-row { padding:10px 0; }
+      .controls { grid-template-columns:auto auto minmax(0,1fr); gap:10px; padding:17px 0; }
+      .play-button { min-width:83px; padding-inline:11px; }
+      .slider-wrap { flex-direction:column; gap:0; align-items:stretch; }
+      input[type="range"] { margin:13px 0; }
+      .frame-readout { font-size:12px; text-align:right; }
+      .mechanism-caption { font-size:12px; }
+      .method-notes { grid-template-columns:1fr; gap:19px; }
+      footer { flex-direction:column; gap:7px; padding:25px 0; font-size:12px; }
+    }
+    @media (min-width:641px) and (max-width:900px) {
+      .performance-grid { grid-template-columns:minmax(0,1fr); }
+    }
+    @media (max-width:420px) {
+      .gallery-grid { grid-template-columns:minmax(0,1fr); }
+      .gallery-card .media-box { aspect-ratio:16/9; }
+      .case-head,.benchmark-top { flex-wrap:wrap; }
+      .section-index { display:none; }
+    }
+    .paired-gallery { display:grid; gap:34px; }
+    .dataset-group { padding:26px; border:1px solid var(--line); border-radius:10px; background:white; }
+    .dataset-heading { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; padding-bottom:19px; margin-bottom:22px; border-bottom:1px solid var(--line); }
+    .dataset-heading h3 { font-size:23px; letter-spacing:-.025em; margin:0; font-weight:600; }
+    .model-badge { display:inline-block; margin-left:9px; color:var(--teal); font-size:16px; font-weight:500; }
+    .dataset-heading p { margin:0; font-size:13px; color:var(--muted); }
+    .paired-tasks { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:25px; }
+    .paired-task { min-width:0; }
+    .paired-task h4 { margin:0 0 15px; font-size:17px; font-weight:600; }
+    .paired-clips { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:13px; }
+    .paired-clips .video-caption { flex-wrap:wrap; gap:4px; }
+    .paired-clips .video-title { font-size:14px; }
+    .paired-clips .media-box { aspect-ratio:4/3; }
+    .paired-clips .video-stat { font-size:12px; gap:8px; flex-wrap:wrap; }
+    .paired-clips .video-stat strong { font-size:23px; }
+    .mechanism-grid,.baseline-grid { display:grid; grid-template-columns:minmax(0,1.55fr) minmax(0,1fr); gap:20px; align-items:start; }
+    .mechanism-grid > .state-panel { order:2; grid-column:1/-1; display:grid; grid-template-columns:1fr 1fr; gap:12px 28px; padding:20px 24px; }
+    .mechanism-grid .state-heading { grid-column:1/-1; }
+    .mechanism-grid .state-list { margin:0; }
+    .mechanism-grid .state-detail { padding-top:0; }
+    .mechanism-grid .state-message { min-height:0; margin-block:9px; }
+    .mechanism-grid .state-footnote { padding-top:8px; margin-top:8px; }
+    .linked-video { min-width:0; margin:0; padding:23px; border:1px solid #c6dbce; border-radius:6px; background:#edf5ef; }
+    .linked-video.baseline { background:#f3f1ed; border-color:#ded7cb; }
+    .linked-video figcaption { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:16px; font-weight:600; font-size:17px; }
+    .linked-video figcaption span { font-weight:400; color:var(--muted); font-size:13px; }
+    .linked-media { aspect-ratio:16/10; }
+    .linked-media video { pointer-events:none; }
+    .linked-video .media-state { font-size:14px; margin:14px 0 0; color:#52665b; }
+    .linked-video .media-time { font-size:12px; color:var(--muted); margin:8px 0 0; }
+    .linked-pending { display:grid; gap:8px; padding:14px; }
+    .baseline-heading { display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; margin:31px 0 17px; border-top:1px solid var(--line); padding-top:26px; }
+    .baseline-heading h3 { font-size:23px; font-weight:550; margin:0; letter-spacing:-.02em; }
+    .baseline-heading p { margin:0; font-size:14px; color:var(--muted); }
+    .baseline-chart-grid { display:grid; grid-template-columns:142px minmax(0,1fr); grid-template-rows:190px 26px; align-items:center; position:relative; }
+    #baseline-trace-container { height:190px; position:relative; border-bottom:1px solid var(--line); }
+    .baseline-chart-grid .cursor-layer { left:142px; }
+    .baseline-line { stroke:var(--clay); }
+    #baseline-feature-dot { background:var(--clay); box-shadow:0 0 0 1px var(--clay); }
+    .sync-status { color:var(--muted); font-size:14px; margin:0 0 16px; }
+    @media (max-width:1000px) { .paired-tasks { grid-template-columns:1fr; } }
+    @media (max-width:850px) {
+      .mechanism-grid,.baseline-grid { grid-template-columns:1fr; }
+      .linked-media { aspect-ratio:16/9; }
+    }
+    @media (max-width:640px) {
+      .dataset-group { padding:19px 15px; }
+      .dataset-heading h3 { font-size:21px; }
+      .model-badge { display:block; margin:4px 0 0; }
+      .paired-clips { gap:10px; }
+      .paired-clips .media-box small { display:none; }
+      .paired-clips .media-box strong { font-size:12px; }
+      .paired-clips .frame-icon { width:28px; }
+      .mechanism-grid > .state-panel { grid-template-columns:1fr; padding:18px; }
+      .linked-video { padding:18px; }
+      .baseline-chart-grid { grid-template-columns:104px minmax(0,1fr); }
+      .baseline-chart-grid .cursor-layer { left:104px; }
+    }
+    @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+    @media print {
+      .wrap { width:100%; } .nav,.resources,.controls,.skip { display:none; }
+      .hero { padding-top:25px; } .section { margin-top:30px; padding-top:25px; }
+      .video-placeholder { min-height:90px; } .mechanism-grid { break-inside:avoid; }
+      details > * { display:block; } footer { padding:12px 0; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="wrap">
+    <header class="masthead">
+      <a class="wordmark" href="#overview" aria-label="SteerAct overview">
+        <svg class="brand-mark" viewBox="0 0 28 28" fill="none" aria-hidden="true"><path d="M2 18h6l5-12 5 17 4-10h4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        SteerAct
+      </a>
+      <nav class="nav" aria-label="Page sections"><a href="#real-robots">Real robots</a><a href="#videos">Video gallery</a><a href="#mechanism">Method</a><span class="preview">Research preview</span></nav>
+    </header>
+    <main id="main">
+      <section class="hero" id="overview" aria-labelledby="hero-title">
+        <p class="eyebrow">SteerAct · Test-time activation steering</p>
+        <h1 id="hero-title"><span class="line">More successful robot policies.</span> <span class="line"><em>One sparse feature.</em> No fine-tuning.</span></h1>
+        <p class="lead">Successes and failures leave different temporal signatures in sparse latent space. SteerAct uses these signatures to guide online, gated interventions—while keeping the policy frozen.</p>
+        <div class="resources" aria-label="Project resources and demonstrations">
+          <a class="resource" href="https://github.com/Anonymous-Submission-20/steeract" target="_blank" rel="noopener noreferrer"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="m6 5-4 5 4 5m8-10 4 5-4 5m-3-12-2 14"/></svg>Code</a>
+          <a class="resource primary" href="#real-robots">Explore the demos <span aria-hidden="true">↗</span></a>
+        </div>
+      </section>
+      <section class="section" id="real-robots" aria-labelledby="real-title">
+        <div class="section-heading"><div><p class="eyebrow">From simulation to the real world</p><h2 id="real-title">Same policy. Higher success.</h2><p class="section-lead">Three real-robot tasks with π<sub>0.5</sub>.</p></div><span class="section-index" aria-hidden="true">01</span></div>
+        <div class="robot-list" id="robot-list"></div>
+        <p class="evidence-note">Numbers are reported evaluation success rates, not outcomes inferred from the video slots. All footage is pending; the slots do not yet show paired trials.</p>
+      </section>
+      <section class="section" id="videos" aria-labelledby="videos-title">
+        <div class="section-heading"><div><p class="eyebrow">The video gallery</p><h2 id="videos-title">Same task. With and without steering.</h2><p class="section-lead">Grouped by dataset and model. Each task has an Unsteered / SteerAct comparison, with the corresponding reported success rates.</p></div><span class="section-index" aria-hidden="true">02</span></div>
+        <div class="filter-row" role="group" aria-label="Filter simulation video slots by benchmark"><button class="filter" type="button" aria-pressed="true" data-filter="all">All tasks</button><button class="filter" type="button" aria-pressed="false" data-filter="robotwin">RoboTwin 2.0</button><button class="filter" type="button" aria-pressed="false" data-filter="dexjoco">DexJoCo</button><span class="gallery-count" id="gallery-count" role="status" aria-live="polite">4 model–dataset groups · 8 comparisons</span></div>
+        <div class="paired-gallery" id="gallery-grid"></div>
+        <p class="evidence-note">A selected demonstration is not an aggregate evaluation. No videos are loaded in this design preview; task scores above and below come from the supplied experiment tables.</p>
+      </section>
+      <section class="section" id="mechanism" aria-labelledby="mechanism-title">
+        <div class="explanation-head"><div>
+          <p class="eyebrow">03 · Inside the intervention</p>
+          <h2 id="mechanism-title">See when steering turns on.</h2>
+          <p class="section-lead">Feature history informs the correction; two gates decide whether to intervene.</p>
+          <p class="demo-disclosure"><svg class="icon" style="width:13px;height:13px" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8"/><path d="M10 9v5m0-9v1"/></svg>Illustrative timeline · not experimental data</p>
+        </div></div>
+        <p class="method-intro">The key signal is <strong>how a sparse feature evolves</strong>, not just its current activation. Outcome-conditioned temporal descriptors identify a feature direction; online support and outcome gates determine when a bounded correction is allowed.</p>
+        <noscript><p>Enable JavaScript to view the real-robot comparisons, video slots, and interactive timeline.</p></noscript>
+        <div class="mechanism-grid">
+          <div class="chart-panel">
+            <div class="chart-title"><h3>SteerAct · selected feature</h3><span>Illustrative history</span></div>
+            <div class="chart-grid" role="img" aria-label="Illustrative feature history, two separate gates and signed corrections on a shared robot-decision axis. Corrections are zero whenever a gate is closed." aria-describedby="gate-rule">
+              <div class="row-label">Feature intensity<small>Schematic units</small></div>
+              <div class="trace-container">
+                <svg class="trace-svg" viewBox="0 0 1000 150" preserveAspectRatio="none" aria-hidden="true">
+                  <defs><clipPath id="history-clip"><rect id="history-window" x="0" y="0" width="542" height="150"/></clipPath></defs>
+                  <path class="grid-line" d="M0 35H1000M0 80H1000M0 125H1000"/>
+                  <path id="trace-context" class="trace-line trace-full" d=""/>
+                  <path id="trace-history" class="trace-line" d="" clip-path="url(#history-clip)"/>
+                </svg>
+              </div>
+              <div class="row-label">Maturity support</div><div class="track" id="maturity-track"></div>
+              <div class="row-label">Outcome gate</div><div class="track outcome" id="outcome-track"></div>
+              <div class="row-label">Signed correction<small>Along a fixed direction</small></div>
+              <div class="correction-container"><svg class="correction-svg" viewBox="0 0 1000 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0 35H1000" stroke="#b8c3bd" stroke-width="1" vector-effect="non-scaling-stroke"/><g id="correction-bars"></g></svg></div>
+              <div></div><div class="axis"><span>0</span><span class="axis-label">Robot decision</span><span>120</span></div>
+              <div class="cursor-layer" aria-hidden="true"><div class="cursor" id="timeline-cursor" style="left:54.1667%"><span class="cursor-dot" id="feature-dot"></span></div></div>
+            </div>
+            <p class="timeline-note">Colored tracks indicate open gates. Bars retain the correction sign.</p>
+          </div>
+          <aside class="state-panel" aria-labelledby="state-title">
+            <div class="state-heading"><h3 id="state-title">At this moment</h3><span class="step" id="step-label">STEP 065</span></div>
+            <dl class="state-list">
+              <div class="state-row"><dt>History support</dt><dd id="maturity-value">Ready</dd></div>
+              <div class="state-row"><dt>Outcome gate</dt><dd id="outcome-value">Open</dd></div>
+              <div class="state-row"><dt>Steering</dt><dd id="permission-value">Permitted</dd></div>
+            </dl>
+            <div class="state-detail">
+              <div class="alpha-box"><span class="alpha-label">Correction α<sub>t</sub><br>Schematic units</span><output id="alpha-value">+0.058</output></div>
+              <p class="state-message" id="state-message">A signed correction is shown along the selected decoder direction.</p>
+              <p class="state-footnote">Maturity measures descriptor support,<br><strong>not task progress.</strong></p>
+            </div>
+          </aside>
+          <figure class="linked-video ours">
+            <figcaption>SteerAct robot video <span>Linked to the timeline</span></figcaption>
+            <div class="media-box linked-media" id="steered-media-box">
+              <video id="steered-linked-video" playsinline muted preload="metadata" hidden aria-label="SteerAct robot video controlled by the SteerAct player"></video>
+              <div class="linked-pending" id="steered-video-pending"><strong>Video pending</strong><small>Steered rollout footage</small></div>
+            </div>
+            <p class="media-state" id="steered-media-status">No footage loaded. The feature trace is illustrative.</p>
+            <p class="media-time" id="steered-media-time">SteerAct decision 065 / 120</p>
+          </figure>
+        </div>
+        <div class="controls" aria-label="SteerAct illustrative timeline playback">
+          <button class="play-button" id="play-button" type="button" aria-label="Play illustrative timeline" aria-pressed="false"><svg class="play-icon" viewBox="0 0 12 12" aria-hidden="true"><path id="play-symbol" d="M2 1L11 6 2 11Z"/></svg><span id="play-text">Play</span></button>
+          <button class="replay" id="replay-button" type="button" aria-label="Reset illustrative timeline to the beginning" title="Reset to the beginning"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 6a7 7 0 1 1-1 7M4 2v5h5"/></svg></button>
+          <div class="slider-wrap"><label class="sr-only" for="timeline-slider">Illustrative robot decision</label><input id="timeline-slider" type="range" min="0" max="120" value="65" step="1" aria-describedby="gate-rule"><output class="frame-readout" id="frame-readout" for="timeline-slider">065 / 120</output></div>
+          <p class="control-caption">SteerAct player<br>Feature + robot video</p>
+        </div>
+        <p class="sync-status" id="sync-status" role="status" aria-live="polite">Controls the SteerAct curve and its linked video only. Footage and measured feature logs are pending.</p>
+        <div class="baseline-heading"><h3>Without steering</h3><p>Unsteered feature history + corresponding robot video</p></div>
+        <div class="baseline-grid">
+          <div class="chart-panel">
+            <div class="chart-title"><h3>Unsteered · selected feature</h3><span>No intervention · α = 0</span></div>
+            <div class="baseline-chart-grid" role="img" aria-label="Illustrative unsteered feature history on the same decision axis. This is not a measured counterfactual.">
+              <div class="row-label">Feature intensity<small>Schematic units</small></div>
+              <div id="baseline-trace-container">
+                <svg class="trace-svg" viewBox="0 0 1000 150" preserveAspectRatio="none" aria-hidden="true">
+                  <defs><clipPath id="baseline-history-clip"><rect id="baseline-history-window" x="0" y="0" width="542" height="150"/></clipPath></defs>
+                  <path class="grid-line" d="M0 35H1000M0 80H1000M0 125H1000"/>
+                  <path id="baseline-trace-context" class="trace-line baseline-line trace-full" d=""/>
+                  <path id="baseline-trace-history" class="trace-line baseline-line" d="" clip-path="url(#baseline-history-clip)"/>
+                </svg>
+              </div>
+              <div></div><div class="axis"><span>0</span><span class="axis-label">Robot decision</span><span>120</span></div>
+              <div class="cursor-layer" aria-hidden="true"><div class="cursor" id="baseline-timeline-cursor" style="left:54.1667%"><span class="cursor-dot" id="baseline-feature-dot"></span></div></div>
+            </div>
+            <p class="timeline-note">Same feature scale; independent playback. No correction is applied.</p>
+          </div>
+          <figure class="linked-video baseline">
+            <figcaption>Unsteered robot video <span>Linked to the timeline</span></figcaption>
+            <div class="media-box linked-media" id="unsteered-media-box">
+              <video id="unsteered-linked-video" playsinline muted preload="metadata" hidden aria-label="Unsteered robot video controlled by the Without steering player"></video>
+              <div class="linked-pending" id="unsteered-video-pending"><strong>Video pending</strong><small>Unsteered rollout footage</small></div>
+            </div>
+            <p class="media-state" id="unsteered-media-status">No footage loaded. The feature trace is illustrative.</p>
+            <p class="media-time" id="unsteered-media-time">Unsteered decision 065 / 120</p>
+          </figure>
+        </div>
+        <div class="controls" aria-label="Unsteered illustrative timeline playback">
+          <button class="play-button" id="baseline-play-button" type="button" aria-label="Play unsteered illustrative timeline" aria-pressed="false"><svg class="play-icon" viewBox="0 0 12 12" aria-hidden="true"><path id="baseline-play-symbol" d="M2 1L11 6 2 11Z"/></svg><span id="baseline-play-text">Play</span></button>
+          <button class="replay" id="baseline-replay-button" type="button" aria-label="Reset unsteered illustrative timeline to the beginning" title="Reset unsteered playback"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 6a7 7 0 1 1-1 7M4 2v5h5"/></svg></button>
+          <div class="slider-wrap"><label class="sr-only" for="baseline-timeline-slider">Unsteered robot decision</label><input id="baseline-timeline-slider" type="range" min="0" max="120" value="65" step="1" aria-describedby="baseline-sync-status"><output class="frame-readout" id="baseline-frame-readout" for="baseline-timeline-slider">065 / 120</output></div>
+          <p class="control-caption">Unsteered player<br>Feature + robot video</p>
+        </div>
+        <p class="sync-status" id="baseline-sync-status" role="status" aria-live="polite">Controls the unsteered curve and its linked video only. Footage and measured feature logs are pending.</p>
+        <p class="mechanism-caption" id="gate-rule"><strong>Both gates must be open to permit steering;</strong> bounded search may still select zero correction. Both curves are synthetic layout illustrations, not a measured steered/unsteered experiment. Video alignment uses explicit decision-to-video time mappings, not matched clip lengths.</p>
+        <p class="sr-only" id="playback-announcement" role="status" aria-live="polite"></p>
+        <p class="sr-only" id="baseline-playback-announcement" role="status" aria-live="polite"></p>
+      </section>
+      <section class="closing" aria-label="Research takeaway"><div><h2>Adapt the activations. Keep the policy.</h2><p>SteerAct couples outcome-conditioned temporal matching with gated, single-feature interventions. No policy fine-tuning is performed.</p></div><a href="#overview">Back to top ↑</a></section>
+    </main>
+    <footer><span>SteerAct · Research project preview</span><span>Reported results supplied by the authors. Videos and publication links pending.</span></footer>
+  </div>
+  <script id="results-model">
+    var SteerResults = (() => {
+      // Source: the supplied main results tables. Do not mix in the nine-task ablation subset.
+      const settings = [
+        {id:'robotwin-pi', benchmark:'RoboTwin 2.0', backbone:'π0.5', tasks:10, methods:{
+          Base:[74,72,81,43,73,89,84,47,62,77], 'DSRL-SAC':[80,78,84,40,57,49,100,65,71,100], COAST:[62,74,78,49,75,88,86,40,66,76], DrVLA:[62,84,65,60,86,72,91,48,68,72], 'SteerAct (Dec)':[79,83,77,39,81,92,87,44,67,66], 'SteerAct (Enc)':[88,83,76,58,82,94,93,52,69,80]}},
+        {id:'robotwin-wam', benchmark:'RoboTwin 2.0', backbone:'Fast-WAM', tasks:10, methods:{
+          Base:[72,77,71,63,71,91,31,53,87,79], 'DSRL-SAC':null, COAST:[64,72,73,74,77,84,52,59,78,66], DrVLA:[78,72,79,76,73,94,52,63,74,84], 'SteerAct (Dec)':[84,79,74,75,81,91,54,60,90,80], 'SteerAct (Enc)':[84,78,76,72,85,94,43,73,95,83]}},
+        {id:'dexjoco-pi', benchmark:'DexJoCo', backbone:'π0.5', tasks:9, methods:{
+          Base:[82,67,83,22,71,92,15,77,52], 'DSRL-SAC':[80,60,70,18,74,96,10,69,47], COAST:[87,75,79,33,69,93,19,74,59], DrVLA:[85,76,87,26,68,94,15,84,55], 'SteerAct (Dec)':[79,74,75,21,87,96,17,91,59], 'SteerAct (Enc)':[90,79,95,32,83,97,23,85,63]}},
+        {id:'dexjoco-wam', benchmark:'DexJoCo', backbone:'Fast-WAM', tasks:9, methods:{
+          Base:[22,7,70,12,4,52,0,19,24], 'DSRL-SAC':null, COAST:[21,7,66,15,5,55,0,21,25], DrVLA:[25,3,73,17,2,63,0,25,22], 'SteerAct (Dec)':[24,5,63,21,5,57,0,25,17], 'SteerAct (Enc)':[27,5,76,19,5,59,0,23,27]}}
+      ];
+      const mean = values => !values || !values.length || values.some(v => !Number.isFinite(v)) ? null : values.reduce((a,b) => a+b,0) / values.length;
+      const summaries = () => settings.map(s => ({...s, base:mean(s.methods.Base).toFixed(1), ours:mean(s.methods['SteerAct (Enc)']).toFixed(1), gain:(mean(s.methods['SteerAct (Enc)']) - mean(s.methods.Base)).toFixed(1)}));
+      // Set src to an actual, approved local/hosted video when footage is available.
+      const real = [
+        {id:'pingpong-transport', title:'Pingpong Transport', base:40, ours:63.3, baseSrc:null, oursSrc:null},
+        {id:'folding-cloth', title:'Folding Cloth', base:33.3, ours:53.3, baseSrc:null, oursSrc:null},
+        {id:'push-cube', title:'Push Cube', base:20, ours:40, baseSrc:null, oursSrc:null}
+      ];
+      const videos = [
+        {id:'bottles-pi', title:'Put Bottles in Dustbin', group:'robotwin', setting:'robotwin-pi', taskIndex:0, src:null},
+        {id:'rank-pi', title:'Rank Blocks by Size', group:'robotwin', setting:'robotwin-pi', taskIndex:3, src:null},
+        {id:'switch-wam', title:'Turn Switch', group:'robotwin', setting:'robotwin-wam', taskIndex:7, src:null},
+        {id:'mouse-pad-wam', title:'Place Mouse Pad', group:'robotwin', setting:'robotwin-wam', taskIndex:8, src:null},
+        {id:'bucket-pi', title:'Pick Bucket', group:'dexjoco', setting:'dexjoco-pi', taskIndex:2, src:null},
+        {id:'glasses-pi', title:'Fold Glasses', group:'dexjoco', setting:'dexjoco-pi', taskIndex:4, src:null},
+        {id:'water-wam', title:'Water Plant', group:'dexjoco', setting:'dexjoco-wam', taskIndex:5, src:null},
+        {id:'photograph-wam', title:'Photograph Bi', group:'dexjoco', setting:'dexjoco-wam', taskIndex:8, src:null}
+      ];
+      const pairedVideos = videos.map(v => ({...v,unsteeredSrc:null,steeredSrc:v.src}));
+      const videosFor = group => pairedVideos.filter(v => group === 'all' || v.group === group);
+      const videoGroups = group => settings.map(s => ({id:s.id,benchmark:s.benchmark,backbone:s.backbone,items:videosFor(group).filter(v => v.setting === s.id)})).filter(s => s.items.length);
+      return {settings, summaries, mean, real, videosFor, videoGroups};
+    })();
+  </script>
+  <script>
+    (() => {
+      const results = SteerResults;
+      const frame = '<svg class="frame-icon" viewBox="0 0 44 36" aria-hidden="true"><rect x="3" y="3" width="38" height="30" rx="3"/><path d="M3 11h38M12 3v8M23 3v8M33 3v8M17 18h10M17 23h10"/></svg>';
+      function mediaBox(id, label, src) {
+        const box = document.createElement('div');
+        box.className = 'media-box';
+        box.id = `media-${id}`;
+        const pending = () => { box.replaceChildren(); box.innerHTML = `${frame}<strong>Video pending</strong><small>No footage loaded</small>`; box.setAttribute('aria-label',`${label}. Video pending; no footage loaded.`); };
+        pending();
+        if (src) {
+          const video = document.createElement('video');
+          video.controls = true; video.playsInline = true; video.preload = 'metadata';
+          video.setAttribute('aria-label',label);
+          video.addEventListener('error',pending,{once:true});
+          video.src = src; box.replaceChildren(video); box.removeAttribute('aria-label');
+        }
+        return box;
+      }
+      for (const task of results.real) {
+        const article = document.createElement('article'); article.className = 'robot-case';
+        article.innerHTML = `<div class="case-head"><div><h3>${task.title}</h3><p>Real robot · π<sub>0.5</sub> · Gripper</p></div><span class="gain-pill">+${(task.ours-task.base).toFixed(1)} pp</span></div>`;
+        const pair = document.createElement('div'); pair.className = 'comparison';
+        for (const side of ['base','ours']) {
+          const ours = side === 'ours'; const label = ours ? 'SteerAct (Enc)' : 'Frozen policy';
+          const figure = document.createElement('figure'); figure.className = `video-card ${ours ? 'ours' : ''}`;
+          figure.innerHTML = `<figcaption class="video-caption"><span class="video-title">${label}</span><span class="video-status">${ours ? 'Gated steering' : 'Base'}</span></figcaption>`;
+          figure.append(mediaBox(`${task.id}-${side}`,`${task.title}, ${label}`,task[`${side}Src`]));
+          const stat = document.createElement('p'); stat.className = 'video-stat'; stat.innerHTML = `<span>Task success rate</span><strong>${task[side].toFixed(1)}<small>%</small></strong>`; figure.append(stat); pair.append(figure);
+        }
+        article.append(pair); document.getElementById('robot-list').append(article);
+      }
+      const gallery = document.getElementById('gallery-grid');
+      for (const group of results.videoGroups('all')) {
+        const section = document.createElement('section'); section.className='dataset-group'; section.dataset.setting=group.id;
+        section.innerHTML=`<div class="dataset-heading"><h3>${group.benchmark}<span class="model-badge">${group.backbone}</span></h3><p>${group.items.length} tasks · Unsteered / SteerAct</p></div>`;
+        const tasks=document.createElement('div'); tasks.className='paired-tasks';
+        const setting=results.settings.find(s=>s.id===group.id);
+        for (const item of group.items) {
+          const card=document.createElement('article'); card.className='paired-task';
+          card.innerHTML=`<h4>${item.title}</h4>`;
+          const pair=document.createElement('div'); pair.className='paired-clips';
+          for (const side of ['unsteered','steered']) {
+            const ours=side==='steered'; const label=ours?'SteerAct (Enc)':'Unsteered';
+            const figure=document.createElement('figure'); figure.className=`video-card ${ours?'ours':''}`;
+            figure.innerHTML=`<figcaption class="video-caption"><span class="video-title">${label}</span></figcaption>`;
+            figure.append(mediaBox(`${item.id}-${side}`,`${group.benchmark}, ${group.backbone}, ${item.title}, ${label}`,item[`${side}Src`]));
+            const score=setting.methods[ours?'SteerAct (Enc)':'Base'][item.taskIndex];
+            figure.insertAdjacentHTML('beforeend',`<p class="video-stat"><span>Task success</span><strong>${score}<small>%</small></strong></p>`);
+            pair.append(figure);
+          }
+          card.append(pair); tasks.append(card);
+        }
+        section.append(tasks); gallery.append(section);
+      }
+      const filters = [...document.querySelectorAll('[data-filter]')];
+      filters.forEach(button => button.addEventListener('click',() => {
+        const groups=results.videoGroups(button.dataset.filter);
+        const visible = new Set(groups.map(g => g.id));
+        for (const card of gallery.children) {
+          card.hidden = !visible.has(card.dataset.setting);
+          if (card.hidden) card.querySelectorAll('video').forEach(video => video.pause());
+        }
+        filters.forEach(b => b.setAttribute('aria-pressed',String(b === button)));
+        document.getElementById('gallery-count').textContent = `${visible.size} model–dataset groups · ${groups.reduce((n,g)=>n+g.items.length,0)} comparisons`;
+      }));
+    })();
+  </script>
+  <script id="demo-model">
+    // Deliberately synthetic, deterministic illustration. This is not the policy controller.
+    var SteerDemo = (() => {
+      const maxIndex = 120;
+      const samples = Array.from({length:maxIndex + 1}, (_, index) => {
+        const maturity = (index >= 36 && index < 96) || index >= 106;
+        const outcome = maturity && ((index >= 56 && index < 81) || (index >= 88 && index < 96) || index >= 114);
+        const permitted = maturity && outcome;
+        const feature = Math.max(0.04, Math.min(0.94, 0.2 + 0.38 / (1 + Math.exp(-(index - 48) / 8)) + 0.1 * Math.sin(index / 8) + 0.04 * Math.sin(index * 1.3)));
+        const alpha = permitted && index % 11 !== 0 ? Math.round(0.06 * Math.sin((index - 56) / 7) * 1000) / 1000 : 0;
+        return Object.freeze({index, feature, maturity, outcome, permitted, alpha});
+      });
+      const stateAt = index => samples[Math.min(maxIndex, Math.max(0, Math.floor(Number.isFinite(index) ? index : 0)))];
+      const nextIndex = (index, elapsedMs, speed = 1) => Math.min(maxIndex, Math.max(0, index) + Math.max(0, Number.isFinite(elapsedMs) ? elapsedMs : 0) * 0.005 * (Number.isFinite(speed) ? Math.max(0,speed) : 1));
+      const baselineSamples = Array.from({length:maxIndex+1},(_,index)=>Object.freeze({index,feature:Math.max(0.04,Math.min(0.94,0.23+0.28/(1+Math.exp(-(index-45)/9))+0.12*Math.sin(index/10)+0.055*Math.sin(index*0.85))),alpha:0}));
+      const baselineAt = index => baselineSamples[Math.min(maxIndex,Math.max(0,Math.floor(Number.isFinite(index)?index:0)))];
+      return Object.freeze({samples, stateAt, nextIndex, maxIndex,baselineSamples,baselineAt});
+    })();
+  </script>
+  <script id="sync-model">
+    var SteerSync = (() => {
+      const clampIndex=x=>Math.min(120,Math.max(0,Number.isFinite(x)?x:0));
+      const valid=t=>t&&Number.isFinite(t.offsetSeconds)&&t.offsetSeconds>=0&&Number.isFinite(t.secondsPerDecision)&&t.secondsPerDecision>0;
+      const targetTime=(index,timing,duration)=>!valid(timing)||!Number.isFinite(duration)||duration<=0?null:Math.min(duration,timing.offsetSeconds+clampIndex(index)*timing.secondsPerDecision);
+      const indexFromTime=(time,timing)=>valid(timing)&&Number.isFinite(time)?clampIndex((time-timing.offsetSeconds)/timing.secondsPerDecision):0;
+      function createTransport(entries,onError=()=>{}) {
+        let generation=0,wantsPlay=false,currentIndex=65;
+        const active=()=>entries.filter(e=>!e.failed);
+        function pause(){wantsPlay=false;generation++;for(const e of entries)e.video.pause();}
+        function seek(index,force=true){
+          currentIndex=clampIndex(index);
+          for(const e of active()){
+            const time=targetTime(currentIndex,e.timing,e.video.duration);
+            if(e.video.readyState<1||time===null)continue;
+            if(force||Math.abs(e.video.currentTime-time)>0.15)e.video.currentTime=time;
+          }
+        }
+        async function play(index){
+          const token=++generation; wantsPlay=true;
+          const clips=active();
+          if(clips.some(e=>e.video.readyState<2||!valid(e.timing)||!Number.isFinite(e.video.duration)||e.video.duration<=0||e.timing.offsetSeconds>=e.video.duration)){
+            pause();onError('Video is not ready or its timing is invalid. Wait for loading, then press Play.');return false;
+          }
+          if(clips.some(e=>e.timing.offsetSeconds+clampIndex(index)*e.timing.secondsPerDecision>=e.video.duration)){
+            pause();onError('This decision is outside a linked clip’s playable range. Reset or seek to an earlier decision.');return false;
+          }
+          seek(index);
+          try {
+            const pending=clips.map(e=>{e.video.playbackRate=5*e.timing.secondsPerDecision;return e.video.play();});
+            await Promise.all(pending);
+            if(token!==generation){if(!wantsPlay)for(const e of entries)e.video.pause();return false;}
+            return true;
+          } catch(error){
+            if(token===generation){pause();onError('Video playback could not start. This player is paused; press Play to retry.');}
+            else if(!wantsPlay)for(const e of entries)e.video.pause();
+            return false;
+          }
+        }
+        const clockIndex=()=>{const e=active()[0];return e&&e.video.readyState>=2?indexFromTime(e.video.currentTime,e.timing):null;};
+        return {play,pause,seek,sync:index=>seek(index,false),clockIndex};
+      }
+      return {targetTime,indexFromTime,createTransport};
+    })();
+    // Placeholder timing only. Replace these mappings and both synthetic histories with aligned logs before presenting experimental playback.
+    var SteerMedia = {
+      steered:{src:null,offsetSeconds:0,secondsPerDecision:0.2},
+      unsteered:{src:null,offsetSeconds:0,secondsPerDecision:0.2}
+    };
+  </script>
+  <script>
+    (() => {
+      const byId = id => document.getElementById(id);
+      const svgNS = 'http://www.w3.org/2000/svg';
+      const model = SteerDemo;
+      const path = model.samples.map(s => `${s.index ? 'L' : 'M'}${(s.index / model.maxIndex * 1000).toFixed(2)},${(140 - s.feature * 125).toFixed(2)}`).join(' ');
+      byId('trace-context').setAttribute('d',path);
+      byId('trace-history').setAttribute('d',path);
+      const baselinePath=model.baselineSamples.map(s=>`${s.index?'L':'M'}${(s.index/model.maxIndex*1000).toFixed(2)},${(140-s.feature*125).toFixed(2)}`).join(' ');
+      byId('baseline-trace-context').setAttribute('d',baselinePath);
+      byId('baseline-trace-history').setAttribute('d',baselinePath);
+      function drawGate(id, key) {
+        const container = byId(id);
+        let start = null;
+        for (let i = 0; i <= model.samples.length; i++) {
+          const open = i < model.samples.length && model.samples[i][key];
+          if (open && start === null) start = i;
+          if (!open && start !== null) {
+            const span = document.createElement('span');
+            span.className = 'segment';
+            span.style.left = `${start / model.maxIndex * 100}%`;
+            span.style.width = `${(Math.min(i,model.maxIndex) - start) / model.maxIndex * 100}%`;
+            container.appendChild(span);
+            start = null;
+          }
+        }
+      }
+      drawGate('maturity-track','maturity');
+      drawGate('outcome-track','outcome');
+      for (const s of model.samples) {
+        if (s.alpha === 0) continue;
+        const rect = document.createElementNS(svgNS,'rect');
+        const height = Math.abs(s.alpha) / 0.06 * 29;
+        rect.setAttribute('x',Math.min(994,s.index / model.maxIndex * 1000));
+        rect.setAttribute('y',s.alpha > 0 ? 35 - height : 35);
+        rect.setAttribute('width','5.8');
+        rect.setAttribute('height',height);
+        rect.setAttribute('fill',s.alpha > 0 ? '#0b746a' : '#a8583d');
+        byId('correction-bars').appendChild(rect);
+      }
+
+      function mountPlayer(side,prefix) {
+        const control = id => byId(prefix+id);
+        const baseline = side==='unsteered';
+        const label = baseline?'Unsteered':'SteerAct';
+        const slider = control('timeline-slider');
+        const button = control('play-button');
+        const traceContainer = baseline?byId('baseline-trace-container'):document.querySelector('.trace-container');
+        const sampleAt = baseline?model.baselineAt:model.stateAt;
+        const timing = SteerMedia[side], video = byId(side+'-linked-video');
+        const mediaEntries = timing.src?[{video,timing,failed:false}]:[];
+        let index=65,playing=false,starting=false,frameId=null,lastTime=null,reachedClipEnd=false,startRequest=0;
+        const status = message => {control('sync-status').textContent=message;};
+        const transport = SteerSync.createTransport(mediaEntries,status);
+
+        if(mediaEntries.length) {
+          const entry=mediaEntries[0];
+          video.addEventListener('loadedmetadata',()=>{
+            byId(side+'-video-pending').hidden=true;video.hidden=false;transport.seek(index);
+            byId(side+'-media-status').textContent='Connected to the '+label+' player.';
+          });
+          video.addEventListener('error',()=>{
+            entry.failed=true;pause(false);video.hidden=true;byId(side+'-video-pending').hidden=false;
+            byId(side+'-media-status').textContent='Video unavailable. The illustrative trace remains usable.';
+            status(label+' video could not load. Press Play to continue with its illustrative curve.');
+          });
+          video.addEventListener('waiting',()=>{
+            if(playing){pause(false);status(label+' playback paused while its video buffers. Press Play when ready.');}
+          });
+          video.addEventListener('ended',()=>{
+            if(playing||starting){reachedClipEnd=true;pause(false);status(label+' video has ended. Replay starts this player at decision zero.');}
+          });
+          video.src=timing.src;
+        }
+
+        function render() {
+          const s=sampleAt(index), percent=s.index/model.maxIndex*100;
+          control('timeline-cursor').style.left=percent+'%';
+          control('history-window').setAttribute('width',percent*10);
+          control('feature-dot').style.top=(140-s.feature*125)/150*traceContainer.clientHeight+'px';
+          byId(side+'-media-time').textContent=label+' decision '+String(s.index).padStart(3,'0')+' / 120';
+          if(!baseline) {
+            byId('step-label').textContent='STEP '+String(s.index).padStart(3,'0');
+            for(const [id,open,on,off] of [
+              ['maturity-value',s.maturity,'Ready','Not ready'],
+              ['outcome-value',s.outcome,'Open','Closed'],
+              ['permission-value',s.permitted,'Permitted','Off']
+            ]) {
+              byId(id).textContent=open?on:off;
+              byId(id).classList.toggle('closed',!open);
+            }
+            byId('alpha-value').textContent=(s.alpha>0?'+':'')+s.alpha.toFixed(3);
+            byId('alpha-value').style.color=s.alpha<0?'var(--clay)':'var(--teal)';
+            byId('state-message').textContent=!s.maturity
+              ?'History support is not ready. Steering remains off.'
+              :!s.outcome?'History support is ready, but the outcome gate is closed.'
+              :s.alpha===0?'Both gates are open; this illustrative sample has zero correction.'
+              :'A signed correction is shown along the selected decoder direction.';
+          }
+          slider.value=String(s.index);
+          slider.style.background='linear-gradient(to right,'+(baseline?'var(--clay)':'var(--teal)')+' '+percent+'%,#dce3dd '+percent+'%)';
+          slider.setAttribute('aria-valuetext',label+' decision '+s.index+' of 120. '+(baseline?'No intervention.':'Maturity '+(s.maturity?'ready':'not ready')+', outcome gate '+(s.outcome?'open':'closed')+', correction '+s.alpha.toFixed(3)+'.')+' Illustrative data.');
+          control('frame-readout').textContent=String(s.index).padStart(3,'0')+' / 120';
+        }
+        function updateButton() {
+          const action=starting?'Cancel':playing?'Pause':index>=model.maxIndex||reachedClipEnd?'Replay':'Play';
+          control('play-text').textContent=action;
+          control('play-symbol').setAttribute('d',playing?'M2 1H5V11H2ZM8 1H11V11H8Z':'M2 1L11 6 2 11Z');
+          button.setAttribute('aria-label',action+' '+label+' illustrative timeline');
+          button.setAttribute('aria-pressed',String(playing));
+        }
+        function pause(announce=true) {
+          playing=false;starting=false;startRequest++;transport.pause();
+          if(frameId!==null)cancelAnimationFrame(frameId);
+          frameId=null;lastTime=null;updateButton();
+          status(label+' paused at decision '+sampleAt(index).index+'. Only this curve and its linked video are controlled here.');
+          if(announce)control('playback-announcement').textContent=label+' illustration paused at decision '+sampleAt(index).index+'.';
+        }
+        function tick(time) {
+          if(!playing)return;
+          const mediaIndex=transport.clockIndex();
+          if(mediaIndex!==null)index=mediaIndex;
+          else if(lastTime!==null)index=model.nextIndex(index,Math.min(time-lastTime,200));
+          lastTime=time;transport.sync(index);render();
+          if(index>=model.maxIndex) {
+            pause(false);
+            control('playback-announcement').textContent=label+' illustrative playback complete.';
+            status(label+' playback complete. Replay starts this player at decision zero.');
+            return;
+          }
+          frameId=requestAnimationFrame(tick);
+        }
+        button.addEventListener('click',async()=>{
+          if(playing||starting){pause();return;}
+          if(index>=model.maxIndex||reachedClipEnd)index=0;
+          reachedClipEnd=false;starting=true;updateButton();render();
+          const request=++startRequest;
+          const started=await transport.play(index);
+          if(request!==startRequest)return;
+          starting=false;
+          if(!started){updateButton();return;}
+          playing=true;lastTime=null;render();updateButton();
+          control('playback-announcement').textContent='Playing the '+label+' illustrative timeline.';
+          status(mediaEntries.some(e=>!e.failed)?label+' curve and linked video are playing. The curve remains illustrative until measured logs are supplied.':label+' illustrative curve is playing. Robot video pending.');
+          frameId=requestAnimationFrame(tick);
+        });
+        control('replay-button').addEventListener('click',()=>{
+          pause(false);index=0;reachedClipEnd=false;transport.seek(index);render();updateButton();
+          control('playback-announcement').textContent=label+' illustration reset to decision zero.';
+          status(label+' reset to decision zero. The other player is unchanged.');
+        });
+        slider.addEventListener('input',()=>{
+          pause(false);index=Number(slider.value);reachedClipEnd=false;transport.seek(index);render();updateButton();
+          status(label+' paused at decision '+sampleAt(index).index+'. Its curve and linked video are aligned.');
+        });
+        document.addEventListener('visibilitychange',()=>{if(document.hidden&&(playing||starting))pause();});
+        window.addEventListener('resize',render);
+        // Each player starts only after its own explicit user action.
+        render();updateButton();
+      }
+      mountPlayer('steered','');
+      mountPlayer('unsteered','baseline-');
+    })();
+  </script>
+</body>
+</html>
