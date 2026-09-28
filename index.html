@@ -434,9 +434,9 @@
       </section>
       <section class="section" id="videos" aria-labelledby="videos-title">
         <div class="section-heading"><div><p class="eyebrow">The video gallery</p><h2 id="videos-title">Same task. With and without steering.</h2><p class="section-lead">Grouped by dataset and model. Each task has an Unsteered / SteerAct comparison, with the corresponding reported success rates.</p></div><span class="section-index" aria-hidden="true">02</span></div>
-        <div class="filter-row" role="group" aria-label="Filter simulation video slots by benchmark"><button class="filter" type="button" aria-pressed="true" data-filter="all">All tasks</button><button class="filter" type="button" aria-pressed="false" data-filter="robotwin">RoboTwin 2.0</button><button class="filter" type="button" aria-pressed="false" data-filter="dexjoco">DexJoCo</button><span class="gallery-count" id="gallery-count" role="status" aria-live="polite">4 model–dataset groups · 8 comparisons</span></div>
+        <div class="filter-row" role="group" aria-label="Filter simulation videos by benchmark"><button class="filter" type="button" aria-pressed="true" data-filter="all">All tasks</button><button class="filter" type="button" aria-pressed="false" data-filter="robotwin">RoboTwin 2.0</button><button class="filter" type="button" aria-pressed="false" data-filter="dexjoco">DexJoCo</button><span class="gallery-count" id="gallery-count" role="status" aria-live="polite">4 model–dataset groups · 4 comparisons</span></div>
         <div class="paired-gallery" id="gallery-grid"></div>
-        <p class="evidence-note">A selected demonstration is not an aggregate evaluation. No videos are loaded in this design preview; task scores above and below come from the supplied experiment tables.</p>
+        <p class="evidence-note">A selected demonstration is not an aggregate evaluation. The task scores shown below come from the supplied experiment tables, not from these individual rollouts.</p>
       </section>
       <section class="section" id="mechanism" aria-labelledby="mechanism-title">
         <div class="explanation-head"><div>
@@ -541,7 +541,7 @@
       </section>
       <section class="closing" aria-label="Research takeaway"><div><h2>Adapt the activations. Keep the policy.</h2><p>SteerAct couples outcome-conditioned temporal matching with gated, single-feature interventions. No policy fine-tuning is performed.</p></div><a href="#overview">Back to top ↑</a></section>
     </main>
-    <footer><span>SteerAct · Research project preview</span><span>Reported results supplied by the authors. Videos and publication links pending.</span></footer>
+    <footer><span>SteerAct · Research project preview</span><span>Reported results supplied by the authors. Additional real-robot videos and publication links pending.</span></footer>
   </div>
   <script id="results-model">
     var SteerResults = (() => {
@@ -558,23 +558,23 @@
       ];
       const mean = values => !values || !values.length || values.some(v => !Number.isFinite(v)) ? null : values.reduce((a,b) => a+b,0) / values.length;
       const summaries = () => settings.map(s => ({...s, base:mean(s.methods.Base).toFixed(1), ours:mean(s.methods['SteerAct (Enc)']).toFixed(1), gain:(mean(s.methods['SteerAct (Enc)']) - mean(s.methods.Base)).toFixed(1)}));
-      // Set src to an actual, approved local/hosted video when footage is available.
+      // Paths below point to selected local examples bundled with this site.
       const real = [
         {id:'pingpong-transport', title:'Pingpong Transport', base:40, ours:63.3, baseSrc:null, oursSrc:null},
         {id:'folding-cloth', title:'Folding Cloth', base:33.3, ours:53.3, baseSrc:null, oursSrc:null},
         {id:'push-cube', title:'Push Cube', base:20, ours:40, baseSrc:null, oursSrc:null}
       ];
       const videos = [
-        {id:'bottles-pi', title:'Put Bottles in Dustbin', group:'robotwin', setting:'robotwin-pi', taskIndex:0, src:null},
-        {id:'rank-pi', title:'Rank Blocks by Size', group:'robotwin', setting:'robotwin-pi', taskIndex:3, src:null},
-        {id:'switch-wam', title:'Turn Switch', group:'robotwin', setting:'robotwin-wam', taskIndex:7, src:null},
-        {id:'mouse-pad-wam', title:'Place Mouse Pad', group:'robotwin', setting:'robotwin-wam', taskIndex:8, src:null},
-        {id:'bucket-pi', title:'Pick Bucket', group:'dexjoco', setting:'dexjoco-pi', taskIndex:2, src:null},
-        {id:'glasses-pi', title:'Fold Glasses', group:'dexjoco', setting:'dexjoco-pi', taskIndex:4, src:null},
-        {id:'water-wam', title:'Water Plant', group:'dexjoco', setting:'dexjoco-wam', taskIndex:5, src:null},
-        {id:'photograph-wam', title:'Photograph Bi', group:'dexjoco', setting:'dexjoco-wam', taskIndex:8, src:null}
+        {id:'rank-pi', title:'Rank Blocks by Size', group:'robotwin', setting:'robotwin-pi', taskIndex:3,
+          unsteeredSrc:'assets/videos/robotwin-pi05-rank-blocks-baseline.mp4', steeredSrc:'assets/videos/robotwin-pi05-rank-blocks-steering.mp4'},
+        {id:'dump-bin-wam', title:'Dump Bin into Big Bin', group:'robotwin', setting:'robotwin-wam', taskIndex:5,
+          unsteeredSrc:'assets/videos/robotwin-fastwam-dump-bin-baseline.mp4', steeredSrc:'assets/videos/robotwin-fastwam-dump-bin-steering.mp4'},
+        {id:'bucket-pi', title:'Pick Bucket', group:'dexjoco', setting:'dexjoco-pi', taskIndex:2,
+          unsteeredSrc:'assets/videos/dexjoco-pi05-pick-bucket-baseline.mp4', steeredSrc:'assets/videos/dexjoco-pi05-pick-bucket-steering.mp4'},
+        {id:'water-wam', title:'Water Plant', group:'dexjoco', setting:'dexjoco-wam', taskIndex:5,
+          unsteeredSrc:'assets/videos/dexjoco-fastwam-water-plant-baseline.mp4', steeredSrc:'assets/videos/dexjoco-fastwam-water-plant-steering.mp4'}
       ];
-      const pairedVideos = videos.map(v => ({...v,unsteeredSrc:null,steeredSrc:v.src}));
+      const pairedVideos = videos;
       const videosFor = group => pairedVideos.filter(v => group === 'all' || v.group === group);
       const videoGroups = group => settings.map(s => ({id:s.id,benchmark:s.benchmark,backbone:s.backbone,items:videosFor(group).filter(v => v.setting === s.id)})).filter(s => s.items.length);
       return {settings, summaries, mean, real, videosFor, videoGroups};
@@ -711,10 +711,10 @@
       }
       return {targetTime,indexFromTime,createTransport};
     })();
-    // Placeholder timing only. Replace these mappings and both synthetic histories with aligned logs before presenting experimental playback.
+    // The clips are aligned across the 0–120 illustrative decision range. The feature histories remain synthetic.
     var SteerMedia = {
-      steered:{src:null,offsetSeconds:0,secondsPerDecision:0.2},
-      unsteered:{src:null,offsetSeconds:0,secondsPerDecision:0.2}
+      steered:{src:'assets/videos/mechanism-steering.mp4',offsetSeconds:0,secondsPerDecision:0.37},
+      unsteered:{src:'assets/videos/mechanism-baseline.mp4',offsetSeconds:0,secondsPerDecision:0.999}
     };
   </script>
   <script>
