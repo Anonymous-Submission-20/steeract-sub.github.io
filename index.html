@@ -434,7 +434,7 @@
       </section>
       <section class="section" id="videos" aria-labelledby="videos-title">
         <div class="section-heading"><div><p class="eyebrow">The video gallery</p><h2 id="videos-title">Same task. With and without steering.</h2><p class="section-lead">Grouped by dataset and model. Each task has an Unsteered / SteerAct comparison, with the corresponding reported success rates.</p></div><span class="section-index" aria-hidden="true">02</span></div>
-        <div class="filter-row" role="group" aria-label="Filter simulation videos by benchmark"><button class="filter" type="button" aria-pressed="true" data-filter="all">All tasks</button><button class="filter" type="button" aria-pressed="false" data-filter="robotwin">RoboTwin 2.0</button><button class="filter" type="button" aria-pressed="false" data-filter="dexjoco">DexJoCo</button><span class="gallery-count" id="gallery-count" role="status" aria-live="polite">4 model–dataset groups · 4 comparisons</span></div>
+        <div class="filter-row" role="group" aria-label="Filter simulation videos by benchmark"><button class="filter" type="button" aria-pressed="true" data-filter="all">All tasks</button><button class="filter" type="button" aria-pressed="false" data-filter="robotwin">RoboTwin 2.0</button><button class="filter" type="button" aria-pressed="false" data-filter="dexjoco">DexJoCo</button><span class="gallery-count" id="gallery-count" role="status" aria-live="polite">4 model–dataset groups · 8 comparisons</span></div>
         <div class="paired-gallery" id="gallery-grid"></div>
         <p class="evidence-note">A selected demonstration is not an aggregate evaluation. The task scores shown below come from the supplied experiment tables, not from these individual rollouts.</p>
       </section>
@@ -565,14 +565,22 @@
         {id:'push-cube', title:'Push Cube', base:20, ours:40, baseSrc:null, oursSrc:null}
       ];
       const videos = [
+        {id:'bottles-pi', title:'Put Bottles in Dustbin', group:'robotwin', setting:'robotwin-pi', taskIndex:0,
+          unsteeredSrc:'assets/videos/robotwin-put-bottles-failure.mp4', steeredSrc:'assets/videos/robotwin-put-bottles-success.mp4'},
         {id:'rank-pi', title:'Rank Blocks by Size', group:'robotwin', setting:'robotwin-pi', taskIndex:3,
           unsteeredSrc:'assets/videos/robotwin-pi05-rank-blocks-baseline.mp4', steeredSrc:'assets/videos/robotwin-pi05-rank-blocks-steering.mp4'},
-        {id:'dump-bin-wam', title:'Dump Bin into Big Bin', group:'robotwin', setting:'robotwin-wam', taskIndex:5,
-          unsteeredSrc:'assets/videos/robotwin-fastwam-dump-bin-baseline.mp4', steeredSrc:'assets/videos/robotwin-fastwam-dump-bin-steering.mp4'},
+        {id:'switch-wam', title:'Turn Switch', group:'robotwin', setting:'robotwin-wam', taskIndex:7,
+          unsteeredSrc:'assets/videos/robotwin-turn-switch-failure.mp4', steeredSrc:'assets/videos/robotwin-turn-switch-success.mp4'},
+        {id:'mouse-pad-wam', title:'Place Mouse Pad', group:'robotwin', setting:'robotwin-wam', taskIndex:8,
+          unsteeredSrc:'assets/videos/robotwin-place-mouse-pad-failure.mp4', steeredSrc:'assets/videos/robotwin-place-mouse-pad-success.mp4'},
         {id:'bucket-pi', title:'Pick Bucket', group:'dexjoco', setting:'dexjoco-pi', taskIndex:2,
           unsteeredSrc:'assets/videos/dexjoco-pi05-pick-bucket-baseline.mp4', steeredSrc:'assets/videos/dexjoco-pi05-pick-bucket-steering.mp4'},
+        {id:'glasses-pi', title:'Fold Glasses', group:'dexjoco', setting:'dexjoco-pi', taskIndex:4,
+          unsteeredSrc:'assets/videos/dexjoco-fold-glasses-failure.mp4', steeredSrc:'assets/videos/dexjoco-fold-glasses-success.mp4'},
         {id:'water-wam', title:'Water Plant', group:'dexjoco', setting:'dexjoco-wam', taskIndex:5,
-          unsteeredSrc:'assets/videos/dexjoco-fastwam-water-plant-baseline.mp4', steeredSrc:'assets/videos/dexjoco-fastwam-water-plant-steering.mp4'}
+          unsteeredSrc:'assets/videos/dexjoco-fastwam-water-plant-baseline.mp4', steeredSrc:'assets/videos/dexjoco-fastwam-water-plant-steering.mp4'},
+        {id:'photograph-wam', title:'Photograph Bi', group:'dexjoco', setting:'dexjoco-wam', taskIndex:8,
+          unsteeredSrc:'assets/videos/dexjoco-bimanual-photograph-failure.mp4', steeredSrc:'assets/videos/dexjoco-bimanual-photograph-success.mp4'}
       ];
       const pairedVideos = videos;
       const videosFor = group => pairedVideos.filter(v => group === 'all' || v.group === group);
