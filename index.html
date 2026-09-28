@@ -430,7 +430,7 @@
       <section class="section" id="real-robots" aria-labelledby="real-title">
         <div class="section-heading"><div><p class="eyebrow">From simulation to the real world</p><h2 id="real-title">Same policy. Higher success.</h2><p class="section-lead">Three real-robot tasks with π<sub>0.5</sub>.</p></div><span class="section-index" aria-hidden="true">01</span></div>
         <div class="robot-list" id="robot-list"></div>
-        <p class="evidence-note">Numbers are reported evaluation success rates, not outcomes inferred from the video slots. All footage is pending; the slots do not yet show paired trials.</p>
+        <p class="evidence-note">Numbers are reported evaluation success rates, not outcomes inferred from these selected success/failure trials.</p>
       </section>
       <section class="section" id="videos" aria-labelledby="videos-title">
         <div class="section-heading"><div><p class="eyebrow">The video gallery</p><h2 id="videos-title">Same task. With and without steering.</h2><p class="section-lead">Grouped by dataset and model. Each task has an Unsteered / SteerAct comparison, with the corresponding reported success rates.</p></div><span class="section-index" aria-hidden="true">02</span></div>
@@ -541,7 +541,7 @@
       </section>
       <section class="closing" aria-label="Research takeaway"><div><h2>Adapt the activations. Keep the policy.</h2><p>SteerAct couples outcome-conditioned temporal matching with gated, single-feature interventions. No policy fine-tuning is performed.</p></div><a href="#overview">Back to top ↑</a></section>
     </main>
-    <footer><span>SteerAct · Research project preview</span><span>Reported results supplied by the authors. Additional real-robot videos and publication links pending.</span></footer>
+    <footer><span>SteerAct · Research project preview</span><span>Reported results supplied by the authors. Publication links pending.</span></footer>
   </div>
   <script id="results-model">
     var SteerResults = (() => {
@@ -560,9 +560,12 @@
       const summaries = () => settings.map(s => ({...s, base:mean(s.methods.Base).toFixed(1), ours:mean(s.methods['SteerAct (Enc)']).toFixed(1), gain:(mean(s.methods['SteerAct (Enc)']) - mean(s.methods.Base)).toFixed(1)}));
       // Paths below point to selected local examples bundled with this site.
       const real = [
-        {id:'pingpong-transport', title:'Pingpong Transport', base:40, ours:63.3, baseSrc:null, oursSrc:null},
-        {id:'folding-cloth', title:'Folding Cloth', base:33.3, ours:53.3, baseSrc:null, oursSrc:null},
-        {id:'push-cube', title:'Push Cube', base:20, ours:40, baseSrc:null, oursSrc:null}
+        {id:'pingpong-transport', title:'Pingpong Transport', base:40, ours:63.3,
+          baseSrc:'assets/videos/real/pingpong-transport-failure.mp4', oursSrc:'assets/videos/real/pingpong-transport-success.mp4'},
+        {id:'folding-cloth', title:'Folding Cloth', base:33.3, ours:53.3,
+          baseSrc:'assets/videos/real/folding-cloth-failure.mp4', oursSrc:'assets/videos/real/folding-cloth-success.mp4'},
+        {id:'push-cube', title:'Push Cube', base:20, ours:40,
+          baseSrc:'assets/videos/real/push-cube-failure.mp4', oursSrc:'assets/videos/real/push-cube-success.mp4'}
       ];
       const videos = [
         {id:'bottles-pi', title:'Put Bottles in Dustbin', group:'robotwin', setting:'robotwin-pi', taskIndex:0,
