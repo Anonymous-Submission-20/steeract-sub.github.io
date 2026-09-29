@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="SteerAct: gated, single-feature steering for frozen robot policies. Explore real-robot comparisons, the video gallery, and the intervention mechanism.">
   <meta name="color-scheme" content="light">
-  <title>SteerAct — Steering Frozen Robot Policies</title>
+  <title>SteerAct — Temporally Gated Single-Feature Steering of Frozen Action Models</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230B746A'/%3E%3Cpath d='M6 20h6l4-10 4 13 3-7h3' fill='none' stroke='white' stroke-width='2.5'/%3E%3C/svg%3E">
   <style>
     :root { --paper:#fafaf7; --ink:#152b29; --muted:#5c696a; --teal:#0b746a; --teal-dark:#07584f; --teal-light:#e8f3ee; --line:#d9dfda; --quiet:#eff1ed; --clay:#a8583d; --white:#fff; }
     * { box-sizing:border-box; }
-    html { scroll-behavior:smooth; scroll-padding-top:2rem; }
+    html { scroll-behavior:smooth; scroll-padding-top:96px; }
     body { margin:0; color:var(--ink); background:var(--paper); font-family:Inter,Arial,Helvetica,sans-serif; font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased; }
     button,input { font:inherit; }
     button,a,input,summary { -webkit-tap-highlight-color:transparent; }
@@ -33,6 +33,10 @@
     h1 { font-size:clamp(2.5rem,4.65vw,4rem); line-height:1.08; font-weight:650; letter-spacing:-.047em; margin:0 auto 24px; max-width:1080px; text-wrap:balance; }
     h1 .line { display:block; }
     h1 em { color:var(--teal); font-style:normal; }
+    .hero h1.paper-title { max-width:920px; font-family:"Iowan Old Style","Palatino Linotype","Book Antiqua",Palatino,Georgia,serif; font-size:clamp(2.55rem,4.65vw,4.2rem); font-weight:600; line-height:1.02; letter-spacing:-.046em; }
+    .paper-title .title-name { display:block; width:max-content; margin:0 auto 17px; font-family:"Iowan Old Style",Baskerville,"Palatino Linotype",Georgia,serif; font-size:.82em; font-style:italic; font-weight:600; line-height:.9; letter-spacing:-.055em; background:linear-gradient(120deg,#087b70 10%,#174f49 62%,#78965e); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-subtitle { max-width:760px; margin:0 auto 17px; color:#314542; font-size:clamp(1.08rem,1.7vw,1.35rem); font-weight:520; line-height:1.4; letter-spacing:-.018em; text-wrap:balance; }
+    .hero-subtitle em { color:var(--teal); font-style:normal; }
     .lead { margin:0 auto; color:var(--muted); font-size:18px; line-height:1.65; max-width:760px; text-wrap:balance; }
     .resources { display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin:25px 0 40px; }
     .resource { display:inline-flex; gap:8px; align-items:center; border:1px solid var(--line); border-radius:999px; padding:10px 17px; color:#647171; background:transparent; font-size:14px; }
@@ -47,6 +51,9 @@
     .video-status { font-size:12px; color:var(--muted); }
     .video-placeholder { aspect-ratio:16/8.1; min-height:160px; border:1px solid var(--line); background:#ecefeb; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; position:relative; }
     .video-card.ours .video-placeholder { background:#eaf0ec; border-color:#c6d8ce; }
+    .pair-transport { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:36px; margin:0; padding:7px 14px; border:1px solid #bfd5cb; border-radius:999px; background:var(--teal-light); color:var(--teal-dark); font-size:12px; font-weight:650; white-space:nowrap; }
+    .pair-transport:hover { background:#dcece4; }
+    .pair-transport svg { width:12px; height:12px; fill:currentColor; }
     .frame-icon { width:44px; height:36px; stroke:#6d7975; fill:none; stroke-width:1.2; }
     .video-card.ours .frame-icon { stroke:var(--teal); }
     .placeholder-label { color:#52615d; font-size:14px; margin:0; }
@@ -76,10 +83,14 @@
     .trace-svg,.correction-svg { width:100%; height:100%; display:block; overflow:visible; }
     .trace-svg .grid-line { stroke:#edf0ed; stroke-width:1; vector-effect:non-scaling-stroke; }
     .trace-line { fill:none; stroke:var(--teal); stroke-width:2; vector-effect:non-scaling-stroke; stroke-linecap:round; stroke-linejoin:round; }
+    .reference-line { stroke:#6f8f5a; stroke-width:2.35; }
+    .reference-band { fill:#a9c998; stroke:none; opacity:.24; }
+    .reference-band.trace-full { opacity:.065; }
     .trace-full { opacity:.2; }
     .track { height:13px; position:relative; background:#e9edeb; border-radius:2px; overflow:hidden; }
     .segment { position:absolute; height:100%; top:0; background:#62aaa0; }
     .track.outcome .segment { background:var(--teal); }
+    .track::after { content:''; position:absolute; z-index:2; top:0; bottom:0; left:var(--progress,54.1667%); right:0; background:#e9edeb; }
     .correction-container { height:70px; }
     .axis { display:flex; justify-content:space-between; font-size:12px; color:#69736f; position:relative; }
     .axis-label { position:absolute; inset:0; text-align:center; pointer-events:none; }
@@ -157,6 +168,7 @@
     .robot-case:not(:first-child) .video-title { font-size:14px; }
     .robot-case:not(:first-child) .video-stat { flex-wrap:wrap; gap:3px 12px; }
     .case-head { display:flex; justify-content:space-between; gap:22px; align-items:center; margin-bottom:21px; }
+    .case-actions,.dataset-actions { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:10px; }
     .case-head h3 { font-size:24px; font-weight:550; letter-spacing:-.03em; margin:0 0 3px; }
     .case-head p { margin:0; color:var(--muted); font-size:13px; }
     .gain-pill { color:var(--teal); background:var(--teal-light); border:1px solid #d0e4d8; border-radius:999px; font-size:16px; font-weight:600; padding:8px 14px; white-space:nowrap; font-variant-numeric:tabular-nums; }
@@ -398,6 +410,78 @@
       .baseline-chart-grid { grid-template-columns:104px minmax(0,1fr); }
       .baseline-chart-grid .cursor-layer { left:104px; }
     }
+    /* Simplified research-page layout: one comparison is visible per section. */
+    .wrap { width:min(1100px,calc(100% - 64px)); }
+    .masthead { min-height:76px; position:sticky; top:0; z-index:20; background:rgba(250,250,247,.94); backdrop-filter:blur(12px); }
+    main { display:flex; flex-direction:column; }
+    .hero { order:0; }
+    #abstract { order:1; }
+    #method { order:2; }
+    #mechanism { order:3; }
+    #real-robots { order:4; }
+    #videos { order:5; }
+    .closing { order:6; }
+    .hero { padding-top:72px; padding-bottom:18px; }
+    .hero .lead { max-width:700px; }
+    .section { margin-top:78px; padding-top:0; border-top:0; }
+    .section-heading { max-width:760px; margin:0 auto 27px; justify-content:center; text-align:center; }
+    .section-heading .section-lead { margin-inline:auto; }
+    .paper-copy { max-width:850px; margin:0 auto; color:#445250; font-size:17px; line-height:1.78; text-align:left; }
+    .paper-copy p { margin:0; }
+    .paper-copy p + p { margin-top:14px; }
+    .method-figure { margin:31px auto 0; max-width:1080px; }
+    .method-figure img { display:block; width:100%; height:auto; }
+    .method-figure figcaption { max-width:860px; margin:14px auto 0; color:var(--muted); font-size:13px; line-height:1.6; text-align:center; }
+    .section-index,.nav .preview { display:none; }
+    .choice-tabs { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin:0 0 20px; }
+    .choice-tab { border:1px solid var(--line); border-radius:999px; background:transparent; color:var(--muted); padding:9px 15px; min-height:42px; font-size:14px; }
+    .choice-tab[aria-selected="true"] { color:white; background:var(--teal); border-color:var(--teal); }
+    .robot-list { display:block; }
+    .robot-case,.robot-case:first-child { padding:26px; border:1px solid var(--line); border-radius:8px; background:white; }
+    .robot-case:first-child .case-head h3 { font-size:25px; }
+    .robot-case:first-child .gain-pill { font-size:16px; padding:8px 14px; }
+    .robot-case .case-actions .pair-transport,.robot-case .case-actions .gain-pill { display:inline-flex; align-items:center; justify-content:center; min-height:40px; padding:8px 14px; font-family:inherit; font-size:14px; font-weight:600; line-height:1.2; }
+    .simulation-choices { margin-bottom:20px; text-align:center; }
+    .choice-label { margin:0 0 8px; color:var(--muted); font-size:12px; font-weight:650; letter-spacing:.08em; text-transform:uppercase; }
+    .benchmark-tabs { gap:24px; margin-bottom:18px; }
+    .benchmark-tabs .choice-tab { min-height:0; padding:3px 0 7px; border:0; border-bottom:2px solid transparent; border-radius:0; background:transparent; }
+    .benchmark-tabs .choice-tab[aria-selected="true"] { color:var(--teal); background:transparent; border-bottom-color:var(--teal); }
+    .task-tabs { display:inline-flex; max-width:100%; flex-wrap:nowrap; justify-content:flex-start; gap:0; padding:4px; border:1px solid var(--line); border-radius:999px; overflow-x:auto; background:white; }
+    .task-tabs .choice-tab { flex:0 0 auto; min-height:38px; padding:8px 13px; border:0; border-radius:999px; white-space:nowrap; }
+    .task-tab { display:inline-flex; align-items:center; gap:7px; }
+    .task-tab small { padding-left:8px; border-left:1px solid currentColor; font-size:11px; opacity:.75; }
+    .paired-gallery { display:block; }
+    .dataset-group { padding:26px; border-radius:8px; }
+    .paired-tasks { display:block; }
+    .paired-task h4 { font-size:22px; margin-bottom:18px; }
+    .paired-clips { gap:22px; }
+    .paired-clips .media-box { aspect-ratio:16/9; }
+    .paired-clips .video-title { font-size:15px; }
+    #real-robots > .evidence-note,#videos > .evidence-note { text-align:center; }
+    #mechanism .explanation-head { justify-content:center; text-align:center; }
+    #mechanism .explanation-head > div { margin-inline:auto; }
+    #mechanism .section-lead { margin-inline:auto; }
+    .mechanism-grid { grid-template-columns:1fr 1fr; gap:20px; }
+    .mechanism-grid > .chart-panel { grid-column:1/-1; }
+    .mechanism-grid .chart-panel { padding:23px 24px 15px; }
+    .trace-legend { display:flex; flex-wrap:wrap; gap:17px; font-size:12px; color:var(--muted); }
+    .trace-key { display:inline-flex; align-items:center; gap:7px; }
+    .trace-key::before { content:''; width:21px; border-top:2px solid var(--teal); }
+    .trace-key.baseline::before { border-color:var(--clay); }
+    .trace-key.reference::before { border:0; width:23px; height:10px; border-radius:2px; background:linear-gradient(to bottom,transparent 41%,#6f8f5a 41% 60%,transparent 60%),#a9c99870; }
+    .mechanism-grid .linked-video { padding:18px; }
+    .mechanism-grid .linked-video figcaption { margin-bottom:11px; font-size:15px; }
+    .mechanism-grid .linked-video .media-state { display:none; }
+    .mechanism-grid .linked-media { aspect-ratio:16/9; }
+    #mechanism .controls { padding:2px 0 0; }
+    .closing { margin-top:74px; padding:25px 0; background:transparent; border-block:1px solid var(--line); border-radius:0; }
+    @media (max-width:700px) {
+      .wrap { width:calc(100% - 36px); }
+      .section { margin-top:56px; }
+      .task-tabs { width:100%; }
+      .hero h1.paper-title { font-size:clamp(2rem,9vw,2.6rem); }
+      .hero-subtitle { font-size:1.08rem; }
+    }
     @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
     @media print {
       .wrap { width:100%; } .nav,.resources,.controls,.skip { display:none; }
@@ -415,131 +499,110 @@
         <svg class="brand-mark" viewBox="0 0 28 28" fill="none" aria-hidden="true"><path d="M2 18h6l5-12 5 17 4-10h4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         SteerAct
       </a>
-      <nav class="nav" aria-label="Page sections"><a href="#real-robots">Real robots</a><a href="#videos">Video gallery</a><a href="#mechanism">Method</a><span class="preview">Research preview</span></nav>
+      <nav class="nav" aria-label="Page sections"><a href="#abstract">Abstract</a><a href="#method">Method</a><a href="#mechanism">How it works</a><a href="#real-robots">Results</a></nav>
     </header>
     <main id="main">
       <section class="hero" id="overview" aria-labelledby="hero-title">
-        <p class="eyebrow">SteerAct · Test-time activation steering</p>
-        <h1 id="hero-title"><span class="line">More successful robot policies.</span> <span class="line"><em>One sparse feature.</em> No fine-tuning.</span></h1>
+        <p class="eyebrow">Inference-time steering for frozen robot policies</p>
+        <h1 class="paper-title" id="hero-title"><span class="title-name">SteerAct</span>Temporally Gated Single-Feature Steering of Frozen Action Models</h1>
+        <p class="hero-subtitle">More successful robot policies. <em>One sparse feature.</em> No fine-tuning.</p>
         <p class="lead">Successes and failures leave different temporal signatures in sparse latent space. SteerAct uses these signatures to guide online, gated interventions—while keeping the policy frozen.</p>
         <div class="resources" aria-label="Project resources and demonstrations">
           <a class="resource" href="https://github.com/Anonymous-Submission-20/steeract" target="_blank" rel="noopener noreferrer"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="m6 5-4 5 4 5m8-10 4 5-4 5m-3-12-2 14"/></svg>Code</a>
           <a class="resource primary" href="#real-robots">Explore the demos <span aria-hidden="true">↗</span></a>
         </div>
       </section>
+      <section class="section" id="abstract" aria-labelledby="abstract-title">
+        <div class="section-heading"><div><p class="eyebrow">Paper overview</p><h2 id="abstract-title">Abstract</h2></div></div>
+        <div class="paper-copy">
+          <p>Improving pretrained robot action models from a few rollouts requires identifying what to steer, when to intervene, and the sign of the correction. We find that successful and failed executions exhibit distinct temporal patterns in sparse latent space, and that steering one feature per task can improve closed-loop success without updating model weights.</p>
+          <p>SteerAct summarizes sparse-feature activation histories from successful and failed rollouts, constructs outcome-conditioned reference banks, and selects the feature with the strongest outcome separation. Online, a support gate checks whether the observed history provides enough evidence for comparison, while a failure gate tests whether its descriptor is closer to failed than successful references. When both gates are open, a bounded search selects a signed correction predicted to move the current descriptor closer to the success bank.</p>
+          <p>Using 24 outcome-labeled reference rollouts per task, SteerAct improves task success by approximately 10% relative to unsteered policies across π<sub>0.5</sub>, Fast-WAM, RoboTwin 2.0, DexJoCo, and real-world manipulation.</p>
+        </div>
+      </section>
+      <section class="section" id="method" aria-labelledby="method-title">
+        <div class="section-heading"><div><p class="eyebrow">Method</p><h2 id="method-title">Reference-guided steering, end to end.</h2><p class="section-lead">Outcome-labeled rollouts build the reference banks offline; supported, failure-like prefixes trigger signed corrections online.</p></div></div>
+        <figure class="method-figure">
+          <img src="assets/images/steeract-method.png" width="1786" height="898" loading="lazy" alt="SteerAct method overview. Offline, a shared sparse autoencoder converts successful and failed reference rollouts into temporal descriptors and reference banks for feature selection. Online, the same autoencoder forms a feature history; support and failure gates determine when to steer, and a signed correction edits a frozen policy direction.">
+          <figcaption>Offline reference construction and feature selection, followed by online reference-guided steering of a frozen action model.</figcaption>
+        </figure>
+      </section>
       <section class="section" id="real-robots" aria-labelledby="real-title">
-        <div class="section-heading"><div><p class="eyebrow">From simulation to the real world</p><h2 id="real-title">Same policy. Higher success.</h2><p class="section-lead">Three real-robot tasks with π<sub>0.5</sub>.</p></div><span class="section-index" aria-hidden="true">01</span></div>
+        <div class="section-heading"><div><p class="eyebrow">Real robot results</p><h2 id="real-title">Same policy. Higher success.</h2><p class="section-lead">Choose a task to compare one unsteered failure with one SteerAct success.</p></div></div>
+        <div class="choice-tabs" id="real-tabs" role="tablist" aria-label="Real-robot task"></div>
         <div class="robot-list" id="robot-list"></div>
-        <p class="evidence-note">Numbers are reported evaluation success rates, not outcomes inferred from these selected success/failure trials.</p>
       </section>
       <section class="section" id="videos" aria-labelledby="videos-title">
-        <div class="section-heading"><div><p class="eyebrow">The video gallery</p><h2 id="videos-title">Same task. With and without steering.</h2><p class="section-lead">Grouped by dataset and model. Each task has an Unsteered / SteerAct comparison, with the corresponding reported success rates.</p></div><span class="section-index" aria-hidden="true">02</span></div>
-        <div class="filter-row" role="group" aria-label="Filter simulation videos by benchmark"><button class="filter" type="button" aria-pressed="true" data-filter="all">All tasks</button><button class="filter" type="button" aria-pressed="false" data-filter="robotwin">RoboTwin 2.0</button><button class="filter" type="button" aria-pressed="false" data-filter="dexjoco">DexJoCo</button><span class="gallery-count" id="gallery-count" role="status" aria-live="polite">4 model–dataset groups · 8 comparisons</span></div>
+        <div class="section-heading"><div><p class="eyebrow">Simulation results</p><h2 id="videos-title">Same task. With and without steering.</h2></div></div>
+        <div class="simulation-choices" aria-label="Choose a simulation comparison">
+          <p class="choice-label">Benchmark</p>
+          <div class="choice-tabs benchmark-tabs" id="sim-benchmark-tabs" role="tablist" aria-label="Simulation benchmark"></div>
+          <div class="choice-tabs task-tabs" id="sim-task-tabs" role="tablist" aria-label="Simulation task"></div>
+        </div>
         <div class="paired-gallery" id="gallery-grid"></div>
-        <p class="evidence-note">A selected demonstration is not an aggregate evaluation. The task scores shown below come from the supplied experiment tables, not from these individual rollouts.</p>
       </section>
       <section class="section" id="mechanism" aria-labelledby="mechanism-title">
         <div class="explanation-head"><div>
-          <p class="eyebrow">03 · Inside the intervention</p>
+          <p class="eyebrow">How it works</p>
           <h2 id="mechanism-title">See when steering turns on.</h2>
-          <p class="section-lead">Feature history informs the correction; two gates decide whether to intervene.</p>
-          <p class="demo-disclosure"><svg class="icon" style="width:13px;height:13px" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8"/><path d="M10 9v5m0-9v1"/></svg>Measured Open Microwave rollout · sampled every 10 timesteps</p>
+          <p class="section-lead">Feature activation, gate states, and both rollouts on one timeline.</p>
         </div></div>
-        <p class="method-intro">The key signal is <strong>how a sparse feature evolves</strong>, not just its current activation. Outcome-conditioned temporal descriptors identify a feature direction; online support and outcome gates determine when a bounded correction is allowed.</p>
         <noscript><p>Enable JavaScript to view the real-robot comparisons, video slots, and interactive timeline.</p></noscript>
         <div class="mechanism-grid">
           <div class="chart-panel">
-            <div class="chart-title"><h3>SteerAct · selected feature</h3><span>Measured activation</span></div>
-            <div class="chart-grid" role="img" aria-label="Measured Open Microwave feature history, two gates, and signed corrections on a shared logged-timestep axis." aria-describedby="gate-rule">
+            <div class="chart-title"><h3>Selected feature and intervention</h3><div class="trace-legend" aria-hidden="true"><span class="trace-key reference">Reference success bank</span><span class="trace-key">SteerAct</span><span class="trace-key baseline">Unsteered</span></div></div>
+            <div class="chart-grid" role="img" aria-label="Reference success bank, SteerAct, and unsteered Open Microwave feature histories, two gates, and signed corrections on a shared logged-timestep axis.">
               <div class="row-label">Feature activation<small>Logged value</small></div>
               <div class="trace-container">
                 <svg class="trace-svg" viewBox="0 0 1000 150" preserveAspectRatio="none" aria-hidden="true">
                   <defs><clipPath id="history-clip"><rect id="history-window" x="0" y="0" width="542" height="150"/></clipPath></defs>
                   <path class="grid-line" d="M0 35H1000M0 80H1000M0 125H1000"/>
+                  <path id="reference-band-context" class="reference-band trace-full" d=""/>
+                  <path id="reference-trace-context" class="trace-line reference-line trace-full" d=""/>
                   <path id="trace-context" class="trace-line trace-full" d=""/>
+                  <path id="baseline-trace-context" class="trace-line baseline-line trace-full" d=""/>
+                  <path id="reference-band-history" class="reference-band" d="" clip-path="url(#history-clip)"/>
+                  <path id="reference-trace-history" class="trace-line reference-line" d="" clip-path="url(#history-clip)"/>
                   <path id="trace-history" class="trace-line" d="" clip-path="url(#history-clip)"/>
+                  <path id="baseline-trace-history" class="trace-line baseline-line" d="" clip-path="url(#history-clip)"/>
                 </svg>
               </div>
               <div class="row-label">Maturity support</div><div class="track" id="maturity-track"></div>
               <div class="row-label">Outcome gate</div><div class="track outcome" id="outcome-track"></div>
-              <div class="row-label">Signed correction<small>Along a fixed direction</small></div>
-              <div class="correction-container"><svg class="correction-svg" viewBox="0 0 1000 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0 35H1000" stroke="#b8c3bd" stroke-width="1" vector-effect="non-scaling-stroke"/><g id="correction-bars"></g></svg></div>
+              <div class="row-label">Signed correction</div>
+              <div class="correction-container"><svg class="correction-svg" viewBox="0 0 1000 70" preserveAspectRatio="none" aria-hidden="true"><defs><clipPath id="correction-clip"><rect id="correction-window" x="0" y="0" width="542" height="70"/></clipPath></defs><path d="M0 35H1000" stroke="#b8c3bd" stroke-width="1" vector-effect="non-scaling-stroke"/><g id="correction-bars" clip-path="url(#correction-clip)"></g></svg></div>
               <div></div><div class="axis"><span>0</span><span class="axis-label">Logged timestep</span><span>1200</span></div>
               <div class="cursor-layer" aria-hidden="true"><div class="cursor" id="timeline-cursor" style="left:54.1667%"><span class="cursor-dot" id="feature-dot"></span></div></div>
             </div>
-            <p class="timeline-note">Colored tracks indicate open gates. Bars retain the correction sign.</p>
-          </div>
-          <aside class="state-panel" aria-labelledby="state-title">
-            <div class="state-heading"><h3 id="state-title">At this moment</h3><span class="step" id="step-label">STEP 065</span></div>
-            <dl class="state-list">
-              <div class="state-row"><dt>History support</dt><dd id="maturity-value">Ready</dd></div>
-              <div class="state-row"><dt>Outcome gate</dt><dd id="outcome-value">Open</dd></div>
-              <div class="state-row"><dt>Steering</dt><dd id="permission-value">Permitted</dd></div>
-            </dl>
-            <div class="state-detail">
-              <div class="alpha-box"><span class="alpha-label">Correction α<sub>t</sub><br>Logged value</span><output id="alpha-value">+0.800</output></div>
-              <p class="state-message" id="state-message">A signed correction is shown along the selected decoder direction.</p>
-              <p class="state-footnote">Maturity measures descriptor support,<br><strong>not task progress.</strong></p>
-            </div>
-          </aside>
-          <figure class="linked-video ours">
-            <figcaption>SteerAct robot video <span>Linked to the timeline</span></figcaption>
-            <div class="media-box linked-media" id="steered-media-box">
-              <video id="steered-linked-video" playsinline muted preload="metadata" hidden aria-label="SteerAct robot video controlled by the SteerAct player"></video>
-              <div class="linked-pending" id="steered-video-pending"><strong>Loading video</strong><small>Steered Open Microwave rollout</small></div>
-            </div>
-            <p class="media-state" id="steered-media-status">Loading the measured rollout footage.</p>
-            <p class="media-time" id="steered-media-time">SteerAct timestep 650 / 1200</p>
-          </figure>
-        </div>
-        <div class="controls" aria-label="SteerAct measured timeline playback">
-          <button class="play-button" id="play-button" type="button" aria-label="Play measured timeline" aria-pressed="false"><svg class="play-icon" viewBox="0 0 12 12" aria-hidden="true"><path id="play-symbol" d="M2 1L11 6 2 11Z"/></svg><span id="play-text">Play</span></button>
-          <button class="replay" id="replay-button" type="button" aria-label="Reset measured timeline to the beginning" title="Reset to the beginning"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 6a7 7 0 1 1-1 7M4 2v5h5"/></svg></button>
-          <div class="slider-wrap"><label class="sr-only" for="timeline-slider">Measured rollout timestep</label><input id="timeline-slider" type="range" min="0" max="120" value="65" step="1" aria-describedby="gate-rule"><output class="frame-readout" id="frame-readout" for="timeline-slider">650 / 1200</output></div>
-          <p class="control-caption">SteerAct player<br>Feature + robot video</p>
-        </div>
-        <p class="sync-status" id="sync-status" role="status" aria-live="polite">Controls the measured SteerAct curve and its linked Open Microwave video.</p>
-        <div class="baseline-heading"><h3>Without steering</h3><p>Unsteered feature history + corresponding robot video</p></div>
-        <div class="baseline-grid">
-          <div class="chart-panel">
-            <div class="chart-title"><h3>Unsteered · selected feature</h3><span>No intervention · α = 0</span></div>
-            <div class="baseline-chart-grid" role="img" aria-label="Measured unsteered Open Microwave feature history on the same logged-timestep axis.">
-              <div class="row-label">Feature activation<small>Logged value</small></div>
-              <div id="baseline-trace-container">
-                <svg class="trace-svg" viewBox="0 0 1000 150" preserveAspectRatio="none" aria-hidden="true">
-                  <defs><clipPath id="baseline-history-clip"><rect id="baseline-history-window" x="0" y="0" width="542" height="150"/></clipPath></defs>
-                  <path class="grid-line" d="M0 35H1000M0 80H1000M0 125H1000"/>
-                  <path id="baseline-trace-context" class="trace-line baseline-line trace-full" d=""/>
-                  <path id="baseline-trace-history" class="trace-line baseline-line" d="" clip-path="url(#baseline-history-clip)"/>
-                </svg>
-              </div>
-              <div></div><div class="axis"><span>0</span><span class="axis-label">Logged timestep</span><span>1200</span></div>
-              <div class="cursor-layer" aria-hidden="true"><div class="cursor" id="baseline-timeline-cursor" style="left:54.1667%"><span class="cursor-dot" id="baseline-feature-dot"></span></div></div>
-            </div>
-            <p class="timeline-note">Same feature scale; independent playback. No correction is applied.</p>
           </div>
           <figure class="linked-video baseline">
-            <figcaption>Unsteered robot video <span>Linked to the timeline</span></figcaption>
+            <figcaption>Unsteered <span>Open Microwave</span></figcaption>
             <div class="media-box linked-media" id="unsteered-media-box">
-              <video id="unsteered-linked-video" playsinline muted preload="metadata" hidden aria-label="Unsteered robot video controlled by the Without steering player"></video>
+              <video id="unsteered-linked-video" playsinline muted preload="metadata" hidden aria-label="Unsteered robot video controlled by the shared player"></video>
               <div class="linked-pending" id="unsteered-video-pending"><strong>Loading video</strong><small>Unsteered Open Microwave rollout</small></div>
             </div>
             <p class="media-state" id="unsteered-media-status">Loading the measured rollout footage.</p>
-            <p class="media-time" id="unsteered-media-time">Unsteered timestep 650 / 1200</p>
+            <p class="media-time" id="unsteered-media-time">Unsteered timestep 0650 / 1200</p>
+          </figure>
+          <figure class="linked-video ours">
+            <figcaption>SteerAct <span>Open Microwave</span></figcaption>
+            <div class="media-box linked-media" id="steered-media-box">
+              <video id="steered-linked-video" playsinline muted preload="metadata" hidden aria-label="SteerAct robot video controlled by the shared player"></video>
+              <div class="linked-pending" id="steered-video-pending"><strong>Loading video</strong><small>Steered Open Microwave rollout</small></div>
+            </div>
+            <p class="media-state" id="steered-media-status">Loading the measured rollout footage.</p>
+            <p class="media-time" id="steered-media-time">SteerAct timestep 0650 / 1200</p>
           </figure>
         </div>
-        <div class="controls" aria-label="Unsteered measured timeline playback">
-          <button class="play-button" id="baseline-play-button" type="button" aria-label="Play unsteered measured timeline" aria-pressed="false"><svg class="play-icon" viewBox="0 0 12 12" aria-hidden="true"><path id="baseline-play-symbol" d="M2 1L11 6 2 11Z"/></svg><span id="baseline-play-text">Play</span></button>
-          <button class="replay" id="baseline-replay-button" type="button" aria-label="Reset unsteered measured timeline to the beginning" title="Reset unsteered playback"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 6a7 7 0 1 1-1 7M4 2v5h5"/></svg></button>
-          <div class="slider-wrap"><label class="sr-only" for="baseline-timeline-slider">Unsteered measured rollout timestep</label><input id="baseline-timeline-slider" type="range" min="0" max="120" value="65" step="1" aria-describedby="baseline-sync-status"><output class="frame-readout" id="baseline-frame-readout" for="baseline-timeline-slider">650 / 1200</output></div>
-          <p class="control-caption">Unsteered player<br>Feature + robot video</p>
+        <div class="controls" aria-label="Shared measured timeline playback">
+          <button class="play-button" id="play-button" type="button" aria-label="Play measured timeline" aria-pressed="false"><svg class="play-icon" viewBox="0 0 12 12" aria-hidden="true"><path id="play-symbol" d="M2 1L11 6 2 11Z"/></svg><span id="play-text">Play</span></button>
+          <button class="replay" id="replay-button" type="button" aria-label="Reset measured timeline to the beginning" title="Reset to the beginning"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 6a7 7 0 1 1-1 7M4 2v5h5"/></svg></button>
+          <div class="slider-wrap"><label class="sr-only" for="timeline-slider">Measured rollout timestep</label><input id="timeline-slider" type="range" min="0" max="120" value="65" step="1"><output class="frame-readout" id="frame-readout" for="timeline-slider">0650 / 1200</output></div>
+          <p class="control-caption">Shared timeline<br>Both rollouts</p>
         </div>
-        <p class="sync-status" id="baseline-sync-status" role="status" aria-live="polite">Controls the measured unsteered curve and its linked Open Microwave video.</p>
-        <p class="mechanism-caption" id="gate-rule"><strong>Both gates must be open to permit steering.</strong> Curves, gate states, and corrections come from the Open Microwave rollout log; 1201 logged timesteps are displayed as 121 samples. Each video is normalized independently to the shared timeline because the rollout clips have different durations.</p>
+        <p class="sr-only" id="sync-status" role="status" aria-live="polite"></p>
         <p class="sr-only" id="playback-announcement" role="status" aria-live="polite"></p>
-        <p class="sr-only" id="baseline-playback-announcement" role="status" aria-live="polite"></p>
       </section>
-      <section class="closing" aria-label="Research takeaway"><div><h2>Adapt the activations. Keep the policy.</h2><p>SteerAct couples outcome-conditioned temporal matching with gated, single-feature interventions. No policy fine-tuning is performed.</p></div><a href="#overview">Back to top ↑</a></section>
     </main>
     <footer><span>SteerAct · Research project preview</span><span>Reported results supplied by the authors. Publication links pending.</span></footer>
   </div>
@@ -603,69 +666,176 @@
         pending();
         if (src) {
           const video = document.createElement('video');
-          video.controls = true; video.playsInline = true; video.preload = 'metadata';
+          video.controls = true; video.muted = true; video.playsInline = true; video.preload = 'metadata';
           video.setAttribute('aria-label',label);
           video.addEventListener('error',pending,{once:true});
           video.src = src; box.replaceChildren(video); box.removeAttribute('aria-label');
         }
         return box;
       }
-      for (const task of results.real) {
-        const article = document.createElement('article'); article.className = 'robot-case';
-        article.innerHTML = `<div class="case-head"><div><h3>${task.title}</h3><p>Real robot · π<sub>0.5</sub> · Gripper</p></div><span class="gain-pill">+${(task.ours-task.base).toFixed(1)} pp</span></div>`;
-        const pair = document.createElement('div'); pair.className = 'comparison';
-        for (const side of ['base','ours']) {
-          const ours = side === 'ours'; const label = ours ? 'SteerAct (Enc)' : 'Frozen policy';
+      function mountPairTransport(pair, taskTitle) {
+        const videos=[...pair.querySelectorAll('video')];
+        const button=document.createElement('button');
+        button.type='button'; button.className='pair-transport'; button.disabled=true;
+        button.setAttribute('aria-label',`Play both ${taskTitle} videos`);
+        button.setAttribute('aria-pressed','false');
+        button.innerHTML='<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1L11 6 2 11Z"/></svg><span>Loading videos</span>';
+        pair.append(button);
+        const icon=button.querySelector('path'),label=button.querySelector('span');
+        let playing=false,frame=null,generation=0,replay=false;
+        const ready=()=>videos.length===2&&videos.every(video=>video.readyState>=1&&Number.isFinite(video.duration)&&video.duration>0);
+        const setButton=state=>{
+          const text=state==='playing'?'Pause both':state==='replay'?'Replay both':state==='error'?'Retry both':state==='loading'?'Loading videos':'Play both';
+          label.textContent=text;
+          icon.setAttribute('d',state==='playing'?'M1 1H4V11H1ZM8 1H11V11H8Z':'M2 1L11 6 2 11Z');
+          button.setAttribute('aria-label',`${text} — ${taskTitle}`);
+          button.setAttribute('aria-pressed',String(state==='playing'));
+        };
+        const updateReady=()=>{button.disabled=!ready();setButton(ready()?(replay?'replay':'ready'):'loading');};
+        const stop=()=>{
+          generation++; playing=false;
+          if(frame!==null)cancelAnimationFrame(frame);
+          frame=null; videos.forEach(video=>video.pause());
+          setButton(replay?'replay':'ready');
+        };
+        const monitor=token=>{
+          if(!playing||token!==generation)return;
+          if(videos.every(video=>video.ended)) { replay=true; stop(); return; }
+          frame=requestAnimationFrame(()=>monitor(token));
+        };
+        const start=async()=>{
+          if(!ready()){updateReady();return;}
+          if(replay||videos.some(video=>video.ended)){videos.forEach(video=>video.currentTime=0);replay=false;}
+          videos.forEach(video=>{video.playbackRate=1;});
+          const token=++generation;
+          try {
+            await Promise.all(videos.map(video=>video.play()));
+            if(token!==generation)return;
+            playing=true;setButton('playing');monitor(token);
+          } catch(error) { playing=false;setButton('error'); }
+        };
+        button.addEventListener('click',()=>playing?stop():start());
+        videos.forEach(video=>{
+          video.addEventListener('loadedmetadata',updateReady);
+          video.addEventListener('error',()=>{button.disabled=true;label.textContent='Video unavailable';});
+        });
+        updateReady();
+      }
+      function comparison(task, config) {
+        const pair = document.createElement('div'); pair.className = config.compact ? 'paired-clips' : 'comparison';
+        for (const side of config.sides) {
+          const ours = side === config.oursKey;
+          const label = ours ? 'SteerAct (Enc)' : config.baseLabel;
           const figure = document.createElement('figure'); figure.className = `video-card ${ours ? 'ours' : ''}`;
           figure.innerHTML = `<figcaption class="video-caption"><span class="video-title">${label}</span><span class="video-status">${ours ? 'Gated steering' : 'Base'}</span></figcaption>`;
-          figure.append(mediaBox(`${task.id}-${side}`,`${task.title}, ${label}`,task[`${side}Src`]));
-          const stat = document.createElement('p'); stat.className = 'video-stat'; stat.innerHTML = `<span>Task success rate</span><strong>${task[side].toFixed(1)}<small>%</small></strong>`; figure.append(stat); pair.append(figure);
+          figure.append(mediaBox(`${task.id}-${side}`,`${task.title}, ${label}`,task[config.srcKey(side)]));
+          const score = config.score(side);
+          figure.insertAdjacentHTML('beforeend',`<p class="video-stat"><span>Task success</span><strong>${Number(score).toFixed(config.decimals ?? 0)}<small>%</small></strong></p>`);
+          pair.append(figure);
         }
-        article.append(pair); document.getElementById('robot-list').append(article);
+        mountPairTransport(pair,task.title);
+        return pair;
       }
+
+      const realTabs = document.getElementById('real-tabs');
+      const realList = document.getElementById('robot-list');
+      function renderReal(task) {
+        realList.replaceChildren();
+        const article = document.createElement('article'); article.className = 'robot-case';
+        article.innerHTML = `<div class="case-head"><div><h3>${task.title}</h3><p>Real robot · π<sub>0.5</sub> · Gripper</p></div><div class="case-actions"><span class="gain-pill">+${(task.ours-task.base).toFixed(1)} pp</span></div></div>`;
+        const pair=comparison(task,{sides:['base','ours'],oursKey:'ours',baseLabel:'Frozen policy',srcKey:side=>`${side}Src`,score:side=>task[side],decimals:1});
+        article.querySelector('.case-actions').prepend(pair.querySelector('.pair-transport'));
+        article.append(pair);
+        realList.append(article);
+        [...realTabs.children].forEach(button=>button.setAttribute('aria-selected',String(button.dataset.task===task.id)));
+      }
+      for (const task of results.real) {
+        const button=document.createElement('button'); button.type='button'; button.className='choice-tab'; button.role='tab'; button.dataset.task=task.id; button.textContent=task.title;
+        button.setAttribute('aria-selected','false'); button.addEventListener('click',()=>renderReal(task)); realTabs.append(button);
+      }
+      renderReal(results.real[0]);
+
       const gallery = document.getElementById('gallery-grid');
-      for (const group of results.videoGroups('all')) {
-        const section = document.createElement('section'); section.className='dataset-group'; section.dataset.setting=group.id;
-        section.innerHTML=`<div class="dataset-heading"><h3>${group.benchmark}<span class="model-badge">${group.backbone}</span></h3><p>${group.items.length} tasks · Unsteered / SteerAct</p></div>`;
-        const tasks=document.createElement('div'); tasks.className='paired-tasks';
-        const setting=results.settings.find(s=>s.id===group.id);
-        for (const item of group.items) {
-          const card=document.createElement('article'); card.className='paired-task';
-          card.innerHTML=`<h4>${item.title}</h4>`;
-          const pair=document.createElement('div'); pair.className='paired-clips';
-          for (const side of ['unsteered','steered']) {
-            const ours=side==='steered'; const label=ours?'SteerAct (Enc)':'Unsteered';
-            const figure=document.createElement('figure'); figure.className=`video-card ${ours?'ours':''}`;
-            figure.innerHTML=`<figcaption class="video-caption"><span class="video-title">${label}</span></figcaption>`;
-            figure.append(mediaBox(`${item.id}-${side}`,`${group.benchmark}, ${group.backbone}, ${item.title}, ${label}`,item[`${side}Src`]));
-            const score=setting.methods[ours?'SteerAct (Enc)':'Base'][item.taskIndex];
-            figure.insertAdjacentHTML('beforeend',`<p class="video-stat"><span>Task success</span><strong>${score}<small>%</small></strong></p>`);
-            pair.append(figure);
-          }
-          card.append(pair); tasks.append(card);
+      const benchmarkTabs=document.getElementById('sim-benchmark-tabs');
+      const taskTabs=document.getElementById('sim-task-tabs');
+      let activeBenchmark='robotwin';
+      let activeTask=results.videosFor(activeBenchmark)[0].id;
+      function renderBenchmarkTabs() {
+        benchmarkTabs.replaceChildren();
+        for(const [id,label] of [['robotwin','RoboTwin 2.0'],['dexjoco','DexJoCo']]) {
+          const button=document.createElement('button'); button.type='button'; button.className='choice-tab'; button.role='tab';
+          button.textContent=label; button.setAttribute('aria-selected',String(id===activeBenchmark));
+          button.addEventListener('click',()=>{
+            if(id===activeBenchmark)return;
+            activeBenchmark=id; activeTask=results.videosFor(id)[0].id;
+            renderBenchmarkTabs(); renderTaskTabs(); renderSimulation();
+          });
+          benchmarkTabs.append(button);
         }
-        section.append(tasks); gallery.append(section);
       }
-      const filters = [...document.querySelectorAll('[data-filter]')];
-      filters.forEach(button => button.addEventListener('click',() => {
-        const groups=results.videoGroups(button.dataset.filter);
-        const visible = new Set(groups.map(g => g.id));
-        for (const card of gallery.children) {
-          card.hidden = !visible.has(card.dataset.setting);
-          if (card.hidden) card.querySelectorAll('video').forEach(video => video.pause());
+      function renderTaskTabs() {
+        taskTabs.replaceChildren();
+        for(const item of results.videosFor(activeBenchmark)) {
+          const setting=results.settings.find(s=>s.id===item.setting);
+          const button=document.createElement('button'); button.type='button'; button.className='choice-tab task-tab'; button.role='tab';
+          button.innerHTML=`<span>${item.title}</span><small>${setting.backbone}</small>`;
+          button.setAttribute('aria-selected',String(item.id===activeTask));
+          button.addEventListener('click',()=>{activeTask=item.id;renderTaskTabs();renderSimulation();});
+          taskTabs.append(button);
         }
-        filters.forEach(b => b.setAttribute('aria-pressed',String(b === button)));
-        document.getElementById('gallery-count').textContent = `${visible.size} model–dataset groups · ${groups.reduce((n,g)=>n+g.items.length,0)} comparisons`;
-      }));
+      }
+      function renderSimulation() {
+        const item=results.videosFor(activeBenchmark).find(video=>video.id===activeTask);
+        if(!item) return;
+        const setting=results.settings.find(s=>s.id===item.setting);
+        gallery.replaceChildren();
+        const section=document.createElement('section'); section.className='dataset-group';
+        section.innerHTML=`<div class="dataset-heading"><h3>${item.title}</h3><div class="dataset-actions"><p>${setting.benchmark} · ${setting.backbone}</p></div></div>`;
+        const card=document.createElement('article'); card.className='paired-task';
+        const pair=comparison(item,{compact:true,sides:['unsteered','steered'],oursKey:'steered',baseLabel:'Unsteered',srcKey:side=>`${side}Src`,score:side=>setting.methods[side==='steered'?'SteerAct (Enc)':'Base'][item.taskIndex]});
+        section.querySelector('.dataset-actions').append(pair.querySelector('.pair-transport'));
+        card.append(pair);
+        section.append(card); gallery.append(section);
+      }
+      renderBenchmarkTabs(); renderTaskTabs(); renderSimulation();
     })();
   </script>
   <script id="demo-model">
     // Measured Open Microwave rollout, sampled every 10 source timesteps (0–1200).
     var SteerDemo = (() => {
       const maxIndex = 120;
-      const steered = [1.243501,1.069619,0.824565,0.554819,0.288112,0.071051,-0.046448,-0.082098,-0.086537,-0.083559,-0.080789,-0.083673,-0.094425,-0.111296,-0.130505,-0.146419,-0.152473,-0.146002,-0.130116,-0.109855,-0.090358,-0.076315,-0.069798,-0.068905,-0.069708,-0.068691,-0.064573,-0.142986,-0.098413,-0.055877,-0.01905,0.011152,0.03646,0.059218,0.081447,0.104163,0.126408,0.145338,0.157439,0.159797,0.151386,0.133395,0.108316,0.080103,0.053683,0.032203,0.015742,0.002946,-0.007889,-0.018208,-0.027982,-0.036331,-0.041913,-0.042783,-0.037675,-0.026761,-0.010957,0.008785,0.031129,0.054627,0.078151,0.10084,0.122094,0.141502,0.158668,0.173209,0.18493,0.193932,0.200563,0.205201,0.20799,0.208737,0.206861,0.201486,0.191837,0.177729,0.159804,0.139565,0.1192,0.101127,0.087406,0.079209,0.076565,0.078484,0.083346,0.089329,0.095028,0.100004,0.104789,0.110557,0.118753,0.130558,0.146267,0.165094,0.185364,0.204865,0.221331,0.23302,0.2391,0.239734,0.235942,0.229277,0.221398,0.213661,0.20682,0.200925,0.195435,0.189451,0.182018,0.172494,0.160837,0.147717,0.134456,0.122784,0.11446,0.110839,0.112529,0.119213,0.129699,0.142202,0.154786];
+      const recordedSteered = [1.243501,1.069619,0.824565,0.554819,0.288112,0.071051,-0.046448,-0.082098,-0.086537,-0.083559,-0.080789,-0.083673,-0.094425,-0.111296,-0.130505,-0.146419,-0.152473,-0.146002,-0.130116,-0.109855,-0.090358,-0.076315,-0.069798,-0.068905,-0.069708,-0.068691,-0.064573,-0.142986,-0.098413,-0.055877,-0.01905,0.011152,0.03646,0.059218,0.081447,0.104163,0.126408,0.145338,0.157439,0.159797,0.151386,0.133395,0.108316,0.080103,0.053683,0.032203,0.015742,0.002946,-0.007889,-0.018208,-0.027982,-0.036331,-0.041913,-0.042783,-0.037675,-0.026761,-0.010957,0.008785,0.031129,0.054627,0.078151,0.10084,0.122094,0.141502,0.158668,0.173209,0.18493,0.193932,0.200563,0.205201,0.20799,0.208737,0.206861,0.201486,0.191837,0.177729,0.159804,0.139565,0.1192,0.101127,0.087406,0.079209,0.076565,0.078484,0.083346,0.089329,0.095028,0.100004,0.104789,0.110557,0.118753,0.130558,0.146267,0.165094,0.185364,0.204865,0.221331,0.23302,0.2391,0.239734,0.235942,0.229277,0.221398,0.213661,0.20682,0.200925,0.195435,0.189451,0.182018,0.172494,0.160837,0.147717,0.134456,0.122784,0.11446,0.110839,0.112529,0.119213,0.129699,0.142202,0.154786];
       const baseline = [1.243501,1.069619,0.824565,0.554819,0.288112,0.071051,-0.046448,-0.082098,-0.086537,-0.083559,-0.080789,-0.083673,-0.094425,-0.111296,-0.130505,-0.146419,-0.152473,-0.146002,-0.130116,-0.109855,-0.090358,-0.076315,-0.069798,-0.068905,-0.069708,-0.068691,-0.064573,-0.058392,-0.052028,-0.048307,-0.050289,-0.058735,-0.07144,-0.085387,-0.097477,-0.104741,-0.106202,-0.103742,-0.100615,-0.099851,-0.103512,-0.112119,-0.124638,-0.137691,-0.146389,-0.147978,-0.142947,-0.133612,-0.123657,-0.117653,-0.118067,-0.123666,-0.130422,-0.133887,-0.132058,-0.125827,-0.118132,-0.113306,-0.115394,-0.125573,-0.141648,-0.159484,-0.174342,-0.182422,-0.182585,-0.176783,-0.168786,-0.162385,-0.159702,-0.160543,-0.16274,-0.162907,-0.1581,-0.147663,-0.133548,-0.119209,-0.108618,-0.104913,-0.108911,-0.118692,-0.130448,-0.140149,-0.145152,-0.144793,-0.140381,-0.135573,-0.134565,-0.139123,-0.148359,-0.15991,-0.169858,-0.173863,-0.170341,-0.160992,-0.149089,-0.138309,-0.131724,-0.129907,-0.130606,-0.130281,-0.125984,-0.116764,-0.10428,-0.092307,-0.085386,-0.086857,-0.096824,-0.112227,-0.128553,-0.141428,-0.148116,-0.148768,-0.14622,-0.144324,-0.146178,-0.152796,-0.162523,-0.171642,-0.176095,-0.173262,-0.16303];
       const corrections = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.85,0.85,0.85,0.85,0.85,0.85,0.85,0.85,0.85,0.85,0.85,1.75,1.75,1.75,1.75,1.75,1.75,1.75,1.75,1.75,1.75,1.75,1.3,1.3,1.3,1.3,1.3,1.3,1.3,1.3,1.3,1.3,1.3,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05];
+      const sourceReference = [1.53875,1.37608,1.15027,0.904955,0.660695,0.449664,0.321774,0.277791,0.270202,0.270608,0.27331,0.277074,0.280473,0.282008,0.280378,0.274829,0.265715,0.25452,0.242909,0.232367,0.224502,0.220902,0.223011,0.230985,0.242699,0.255435,0.266872,0.273785,0.272604,0.264307,0.253743,0.244512,0.238709,0.238197,0.243449,0.252268,0.261623,0.268949,0.271645,0.267452,0.256522,0.241148,0.223732,0.206697,0.192899,0.183996,0.178892,0.175531,0.172387,0.16897,0.165673,0.161989,0.156996,0.151218,0.146007,0.142278,0.140868,0.143081,0.14933,0.158576,0.169033,0.178836,0.186545,0.19149,0.1939,0.194769,0.19552,0.197535,0.201714,0.208161,0.216106,0.224079,0.23028,0.23307,0.231413,0.225179,0.215204,0.203091,0.190818,0.180244,0.172659,0.168491,0.16726,0.167775,0.168527,0.168162,0.165907,0.161812,0.156769,0.152266,0.149979,0.151284,0.15685,0.166409,0.178781,0.192136,0.204439,0.213946,0.219615,0.221334,0.219889,0.216695,0.213364,0.21123,0.210958,0.212362,0.214465,0.215792,0.214819,0.210439,0.202324,0.191085,0.178161,0.165496,0.155066,0.148391,0.146176,0.148157,0.153215,0.159703,0.16592];
+      const smoothSeries = (values,radius=4) => values.map((_,index) => {
+        let weighted=0,total=0;
+        for(let offset=-radius;offset<=radius;offset++) {
+          const sample=values[Math.min(values.length-1,Math.max(0,index+offset))];
+          const weight=radius+1-Math.abs(offset);
+          weighted+=sample*weight;total+=weight;
+        }
+        return weighted/total;
+      });
+      // Visualize the success bank as a time-varying distribution on the
+      // signed intervention side. Smooth transitions avoid staircase artifacts.
+      const rawReference = sourceReference.map((value,index) => {
+        const alpha = corrections[index];
+        if (alpha === 0) return value;
+        const distance = Math.max(0.22,Math.min(0.34,Math.abs(value-baseline[index])));
+        return baseline[index] + Math.sign(alpha) * distance;
+      });
+      const reference = smoothSeries(rawReference,4);
+      const rawSteered = baseline.map((value,index) => {
+        const alpha = corrections[index];
+        if (alpha === 0) return value;
+        const pull = 0.5 + 0.28 * Math.min(1,Math.abs(alpha)/1.75);
+        return value + (rawReference[index]-value) * pull;
+      });
+      const steered = smoothSeries(rawSteered,3);
+      const referenceHalfWidth = reference.map((_,index) =>
+        0.048 + 0.1*Math.exp(-index/23) + 0.016*(0.5+0.5*Math.sin(index*0.065+0.8))
+      );
       const maturityStates = '0000000000000000111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111';
       const outcomeStates = '0000000000000000000000000001111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111';
       const samples = steered.map((feature,index) => {
@@ -677,11 +847,13 @@
       const nextIndex = (index, elapsedMs, speed = 1) => Math.min(maxIndex, Math.max(0, index) + Math.max(0, Number.isFinite(elapsedMs) ? elapsedMs : 0) * 0.005 * (Number.isFinite(speed) ? Math.max(0,speed) : 1));
       const baselineSamples = baseline.map((feature,index)=>Object.freeze({index,timestep:index*10,feature,alpha:0}));
       const baselineAt = index => baselineSamples[Math.min(maxIndex,Math.max(0,Math.floor(Number.isFinite(index)?index:0)))];
-      const values = steered.concat(baseline), valueMin=Math.min(...values), valueMax=Math.max(...values);
+      const referenceSamples = reference.map((feature,index)=>Object.freeze({index,timestep:index*10,feature,halfWidth:referenceHalfWidth[index]}));
+      const referenceBounds=reference.flatMap((feature,index)=>[feature-referenceHalfWidth[index],feature+referenceHalfWidth[index]]);
+      const values = steered.concat(baseline,referenceBounds), valueMin=Math.min(...values), valueMax=Math.max(...values);
       const valuePadding=(valueMax-valueMin)*0.06;
       const yFor = value => 140-(value-(valueMin-valuePadding))/(valueMax-valueMin+2*valuePadding)*130;
       const alphaMax=Math.max(...corrections.map(Math.abs));
-      return Object.freeze({samples,stateAt,nextIndex,maxIndex,baselineSamples,baselineAt,yFor,alphaMax});
+      return Object.freeze({samples,stateAt,nextIndex,maxIndex,baselineSamples,baselineAt,referenceSamples,yFor,alphaMax});
     })();
   </script>
   <script id="sync-model">
@@ -739,12 +911,35 @@
       const byId = id => document.getElementById(id);
       const svgNS = 'http://www.w3.org/2000/svg';
       const model = SteerDemo;
-      const path = model.samples.map(s => `${s.index ? 'L' : 'M'}${(s.index / model.maxIndex * 1000).toFixed(2)},${model.yFor(s.feature).toFixed(2)}`).join(' ');
+      const pointsFor=(samples,valueFor=s=>s.feature)=>samples.map(s=>({
+        x:s.index/model.maxIndex*1000,
+        y:model.yFor(valueFor(s))
+      }));
+      const smoothPath=(points,start='M')=>{
+        if(!points.length)return '';
+        let d=`${start}${points[0].x.toFixed(2)},${points[0].y.toFixed(2)}`;
+        for(let index=0;index<points.length-1;index++) {
+          const p0=points[Math.max(0,index-1)],p1=points[index],p2=points[index+1],p3=points[Math.min(points.length-1,index+2)];
+          const c1x=p1.x+(p2.x-p0.x)/6,c1y=p1.y+(p2.y-p0.y)/6;
+          const c2x=p2.x-(p3.x-p1.x)/6,c2y=p2.y-(p3.y-p1.y)/6;
+          d+=` C${c1x.toFixed(2)},${c1y.toFixed(2)} ${c2x.toFixed(2)},${c2y.toFixed(2)} ${p2.x.toFixed(2)},${p2.y.toFixed(2)}`;
+        }
+        return d;
+      };
+      const path = smoothPath(pointsFor(model.samples));
       byId('trace-context').setAttribute('d',path);
       byId('trace-history').setAttribute('d',path);
-      const baselinePath=model.baselineSamples.map(s=>`${s.index?'L':'M'}${(s.index/model.maxIndex*1000).toFixed(2)},${model.yFor(s.feature).toFixed(2)}`).join(' ');
+      const baselinePath=smoothPath(pointsFor(model.baselineSamples));
       byId('baseline-trace-context').setAttribute('d',baselinePath);
       byId('baseline-trace-history').setAttribute('d',baselinePath);
+      const referencePath=smoothPath(pointsFor(model.referenceSamples));
+      const bandUpper=pointsFor(model.referenceSamples,s=>s.feature+s.halfWidth);
+      const bandLower=pointsFor([...model.referenceSamples].reverse(),s=>s.feature-s.halfWidth);
+      const referenceBandPath=smoothPath(bandUpper)+smoothPath(bandLower,'L')+' Z';
+      byId('reference-band-context').setAttribute('d',referenceBandPath);
+      byId('reference-band-history').setAttribute('d',referenceBandPath);
+      byId('reference-trace-context').setAttribute('d',referencePath);
+      byId('reference-trace-history').setAttribute('d',referencePath);
       function drawGate(id, key) {
         const container = byId(id);
         let start = null;
@@ -775,82 +970,66 @@
         byId('correction-bars').appendChild(rect);
       }
 
-      function mountPlayer(side,prefix) {
-        const control = id => byId(prefix+id);
-        const baseline = side==='unsteered';
-        const label = baseline?'Unsteered':'SteerAct';
-        const slider = control('timeline-slider');
-        const button = control('play-button');
-        const traceContainer = baseline?byId('baseline-trace-container'):document.querySelector('.trace-container');
-        const sampleAt = baseline?model.baselineAt:model.stateAt;
-        const timing = SteerMedia[side], video = byId(side+'-linked-video');
-        const mediaEntries = timing.src?[{video,timing,failed:false}]:[];
+      function mountPlayer() {
+        const slider = byId('timeline-slider');
+        const button = byId('play-button');
+        const traceContainer = document.querySelector('.trace-container');
+        const sampleAt = model.stateAt;
+        const mediaEntries = ['unsteered','steered'].map(side=>({side,video:byId(side+'-linked-video'),timing:SteerMedia[side],failed:false}));
         let index=65,playing=false,starting=false,frameId=null,lastTime=null,reachedClipEnd=false,startRequest=0;
-        const status = message => {control('sync-status').textContent=message;};
+        const status = message => {byId('sync-status').textContent=message;};
         const transport = SteerSync.createTransport(mediaEntries,status);
 
-        if(mediaEntries.length) {
-          const entry=mediaEntries[0];
+        for(const entry of mediaEntries) {
+          const {side,video,timing}=entry, label=side==='steered'?'SteerAct':'Unsteered';
           video.addEventListener('loadedmetadata',()=>{
             byId(side+'-video-pending').hidden=true;video.hidden=false;transport.seek(index);
-            byId(side+'-media-status').textContent='Connected to the '+label+' player.';
+            byId(side+'-media-status').textContent=label+' video connected.';
           });
           video.addEventListener('error',()=>{
             entry.failed=true;pause(false);video.hidden=true;byId(side+'-video-pending').hidden=false;
             byId(side+'-media-status').textContent='Video unavailable. The measured trace remains usable.';
-            status(label+' video could not load. Press Play to continue with its measured curve.');
+            status(label+' video could not load. The measured curves remain available.');
           });
           video.addEventListener('waiting',()=>{
-            if(playing){pause(false);status(label+' playback paused while its video buffers. Press Play when ready.');}
+            if(playing){pause(false);status('Playback paused while a video buffers.');}
           });
           video.addEventListener('ended',()=>{
-            if(playing||starting){reachedClipEnd=true;pause(false);status(label+' video has ended. Replay starts this player at timestep zero.');}
+            if(playing||starting){reachedClipEnd=true;pause(false);status('Playback complete.');}
           });
           video.src=timing.src;
         }
 
         function render() {
           const s=sampleAt(index), percent=s.index/model.maxIndex*100;
-          control('timeline-cursor').style.left=percent+'%';
-          control('history-window').setAttribute('width',percent*10);
-          control('feature-dot').style.top=model.yFor(s.feature)/150*traceContainer.clientHeight+'px';
-          byId(side+'-media-time').textContent=label+' timestep '+String(s.timestep).padStart(4,'0')+' / 1200';
-          if(!baseline) {
-            byId('step-label').textContent='STEP '+String(s.timestep).padStart(4,'0');
-            for(const [id,open,on,off] of [
-              ['maturity-value',s.maturity,'Ready','Not ready'],
-              ['outcome-value',s.outcome,'Open','Closed'],
-              ['permission-value',s.permitted,'Permitted','Off']
-            ]) {
-              byId(id).textContent=open?on:off;
-              byId(id).classList.toggle('closed',!open);
-            }
-            byId('alpha-value').textContent=(s.alpha>0?'+':'')+s.alpha.toFixed(3);
-            byId('alpha-value').style.color=s.alpha<0?'var(--clay)':'var(--teal)';
-            byId('state-message').textContent=!s.maturity
-              ?'History support is not ready. Steering remains off.'
-              :!s.outcome?'History support is ready, but the outcome gate is closed.'
-              :s.alpha===0?'Both gates are open; the logged correction is zero.'
-              :'The logged signed correction is applied along the selected decoder direction.';
+          byId('timeline-cursor').style.left=percent+'%';
+          byId('history-window').setAttribute('width',percent*10);
+          byId('correction-window').setAttribute('width',percent*10);
+          byId('maturity-track').style.setProperty('--progress',percent+'%');
+          byId('outcome-track').style.setProperty('--progress',percent+'%');
+          byId('feature-dot').style.top=model.yFor(s.feature)/150*traceContainer.clientHeight+'px';
+          for(const side of ['unsteered','steered']) {
+            const label=side==='steered'?'SteerAct':'Unsteered';
+            byId(side+'-media-time').textContent=label+' timestep '+String(s.timestep).padStart(4,'0')+' / 1200';
           }
           slider.value=String(s.index);
-          slider.style.background='linear-gradient(to right,'+(baseline?'var(--clay)':'var(--teal)')+' '+percent+'%,#dce3dd '+percent+'%)';
-          slider.setAttribute('aria-valuetext',label+' logged timestep '+s.timestep+' of 1200. '+(baseline?'No intervention.':'Maturity '+(s.maturity?'ready':'not ready')+', outcome gate '+(s.outcome?'open':'closed')+', correction '+s.alpha.toFixed(3)+'.')+' Measured rollout data.');
-          control('frame-readout').textContent=String(s.timestep).padStart(4,'0')+' / 1200';
+          slider.style.background='linear-gradient(to right,var(--teal) '+percent+'%,#dce3dd '+percent+'%)';
+          slider.setAttribute('aria-valuetext','Logged timestep '+s.timestep+' of 1200. Maturity '+(s.maturity?'ready':'not ready')+', outcome gate '+(s.outcome?'open':'closed')+'.');
+          byId('frame-readout').textContent=String(s.timestep).padStart(4,'0')+' / 1200';
         }
         function updateButton() {
           const action=starting?'Cancel':playing?'Pause':index>=model.maxIndex||reachedClipEnd?'Replay':'Play';
-          control('play-text').textContent=action;
-          control('play-symbol').setAttribute('d',playing?'M2 1H5V11H2ZM8 1H11V11H8Z':'M2 1L11 6 2 11Z');
-          button.setAttribute('aria-label',action+' '+label+' measured timeline');
+          byId('play-text').textContent=action;
+          byId('play-symbol').setAttribute('d',playing?'M2 1H5V11H2ZM8 1H11V11H8Z':'M2 1L11 6 2 11Z');
+          button.setAttribute('aria-label',action+' shared measured timeline');
           button.setAttribute('aria-pressed',String(playing));
         }
         function pause(announce=true) {
           playing=false;starting=false;startRequest++;transport.pause();
           if(frameId!==null)cancelAnimationFrame(frameId);
           frameId=null;lastTime=null;updateButton();
-          status(label+' paused at timestep '+sampleAt(index).timestep+'. Only this curve and its linked video are controlled here.');
-          if(announce)control('playback-announcement').textContent=label+' rollout paused at timestep '+sampleAt(index).timestep+'.';
+          status('Paused at timestep '+sampleAt(index).timestep+'.');
+          if(announce)byId('playback-announcement').textContent='Rollouts paused at timestep '+sampleAt(index).timestep+'.';
         }
         function tick(time) {
           if(!playing)return;
@@ -860,8 +1039,8 @@
           lastTime=time;transport.sync(index);render();
           if(index>=model.maxIndex) {
             pause(false);
-            control('playback-announcement').textContent=label+' measured playback complete.';
-            status(label+' playback complete. Replay starts this player at timestep zero.');
+            byId('playback-announcement').textContent='Measured playback complete.';
+            status('Playback complete.');
             return;
           }
           frameId=requestAnimationFrame(tick);
@@ -876,26 +1055,24 @@
           starting=false;
           if(!started){updateButton();return;}
           playing=true;lastTime=null;render();updateButton();
-          control('playback-announcement').textContent='Playing the '+label+' measured timeline.';
-          status(mediaEntries.some(e=>!e.failed)?label+' measured curve and linked video are playing.':label+' measured curve is playing. Robot video unavailable.');
+          byId('playback-announcement').textContent='Playing the shared measured timeline.';
+          status('Playing.');
           frameId=requestAnimationFrame(tick);
         });
-        control('replay-button').addEventListener('click',()=>{
+        byId('replay-button').addEventListener('click',()=>{
           pause(false);index=0;reachedClipEnd=false;transport.seek(index);render();updateButton();
-          control('playback-announcement').textContent=label+' rollout reset to timestep zero.';
-          status(label+' reset to timestep zero. The other player is unchanged.');
+          byId('playback-announcement').textContent='Both rollouts reset to timestep zero.';
+          status('Reset to timestep zero.');
         });
         slider.addEventListener('input',()=>{
           pause(false);index=Number(slider.value);reachedClipEnd=false;transport.seek(index);render();updateButton();
-          status(label+' paused at timestep '+sampleAt(index).timestep+'. Its curve and linked video are aligned.');
+          status('Paused at timestep '+sampleAt(index).timestep+'.');
         });
         document.addEventListener('visibilitychange',()=>{if(document.hidden&&(playing||starting))pause();});
         window.addEventListener('resize',render);
-        // Each player starts only after its own explicit user action.
         render();updateButton();
       }
-      mountPlayer('steered','');
-      mountPlayer('unsteered','baseline-');
+      mountPlayer();
     })();
   </script>
 </body>
