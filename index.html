@@ -443,15 +443,15 @@
           <p class="eyebrow">03 · Inside the intervention</p>
           <h2 id="mechanism-title">See when steering turns on.</h2>
           <p class="section-lead">Feature history informs the correction; two gates decide whether to intervene.</p>
-          <p class="demo-disclosure"><svg class="icon" style="width:13px;height:13px" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8"/><path d="M10 9v5m0-9v1"/></svg>Illustrative timeline · not experimental data</p>
+          <p class="demo-disclosure"><svg class="icon" style="width:13px;height:13px" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8"/><path d="M10 9v5m0-9v1"/></svg>Measured Open Microwave rollout · sampled every 10 timesteps</p>
         </div></div>
         <p class="method-intro">The key signal is <strong>how a sparse feature evolves</strong>, not just its current activation. Outcome-conditioned temporal descriptors identify a feature direction; online support and outcome gates determine when a bounded correction is allowed.</p>
         <noscript><p>Enable JavaScript to view the real-robot comparisons, video slots, and interactive timeline.</p></noscript>
         <div class="mechanism-grid">
           <div class="chart-panel">
-            <div class="chart-title"><h3>SteerAct · selected feature</h3><span>Illustrative history</span></div>
-            <div class="chart-grid" role="img" aria-label="Illustrative feature history, two separate gates and signed corrections on a shared robot-decision axis. Corrections are zero whenever a gate is closed." aria-describedby="gate-rule">
-              <div class="row-label">Feature intensity<small>Schematic units</small></div>
+            <div class="chart-title"><h3>SteerAct · selected feature</h3><span>Measured activation</span></div>
+            <div class="chart-grid" role="img" aria-label="Measured Open Microwave feature history, two gates, and signed corrections on a shared logged-timestep axis." aria-describedby="gate-rule">
+              <div class="row-label">Feature activation<small>Logged value</small></div>
               <div class="trace-container">
                 <svg class="trace-svg" viewBox="0 0 1000 150" preserveAspectRatio="none" aria-hidden="true">
                   <defs><clipPath id="history-clip"><rect id="history-window" x="0" y="0" width="542" height="150"/></clipPath></defs>
@@ -464,7 +464,7 @@
               <div class="row-label">Outcome gate</div><div class="track outcome" id="outcome-track"></div>
               <div class="row-label">Signed correction<small>Along a fixed direction</small></div>
               <div class="correction-container"><svg class="correction-svg" viewBox="0 0 1000 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0 35H1000" stroke="#b8c3bd" stroke-width="1" vector-effect="non-scaling-stroke"/><g id="correction-bars"></g></svg></div>
-              <div></div><div class="axis"><span>0</span><span class="axis-label">Robot decision</span><span>120</span></div>
+              <div></div><div class="axis"><span>0</span><span class="axis-label">Logged timestep</span><span>1200</span></div>
               <div class="cursor-layer" aria-hidden="true"><div class="cursor" id="timeline-cursor" style="left:54.1667%"><span class="cursor-dot" id="feature-dot"></span></div></div>
             </div>
             <p class="timeline-note">Colored tracks indicate open gates. Bars retain the correction sign.</p>
@@ -477,7 +477,7 @@
               <div class="state-row"><dt>Steering</dt><dd id="permission-value">Permitted</dd></div>
             </dl>
             <div class="state-detail">
-              <div class="alpha-box"><span class="alpha-label">Correction α<sub>t</sub><br>Schematic units</span><output id="alpha-value">+0.058</output></div>
+              <div class="alpha-box"><span class="alpha-label">Correction α<sub>t</sub><br>Logged value</span><output id="alpha-value">+0.800</output></div>
               <p class="state-message" id="state-message">A signed correction is shown along the selected decoder direction.</p>
               <p class="state-footnote">Maturity measures descriptor support,<br><strong>not task progress.</strong></p>
             </div>
@@ -486,25 +486,25 @@
             <figcaption>SteerAct robot video <span>Linked to the timeline</span></figcaption>
             <div class="media-box linked-media" id="steered-media-box">
               <video id="steered-linked-video" playsinline muted preload="metadata" hidden aria-label="SteerAct robot video controlled by the SteerAct player"></video>
-              <div class="linked-pending" id="steered-video-pending"><strong>Video pending</strong><small>Steered rollout footage</small></div>
+              <div class="linked-pending" id="steered-video-pending"><strong>Loading video</strong><small>Steered Open Microwave rollout</small></div>
             </div>
-            <p class="media-state" id="steered-media-status">No footage loaded. The feature trace is illustrative.</p>
-            <p class="media-time" id="steered-media-time">SteerAct decision 065 / 120</p>
+            <p class="media-state" id="steered-media-status">Loading the measured rollout footage.</p>
+            <p class="media-time" id="steered-media-time">SteerAct timestep 650 / 1200</p>
           </figure>
         </div>
-        <div class="controls" aria-label="SteerAct illustrative timeline playback">
-          <button class="play-button" id="play-button" type="button" aria-label="Play illustrative timeline" aria-pressed="false"><svg class="play-icon" viewBox="0 0 12 12" aria-hidden="true"><path id="play-symbol" d="M2 1L11 6 2 11Z"/></svg><span id="play-text">Play</span></button>
-          <button class="replay" id="replay-button" type="button" aria-label="Reset illustrative timeline to the beginning" title="Reset to the beginning"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 6a7 7 0 1 1-1 7M4 2v5h5"/></svg></button>
-          <div class="slider-wrap"><label class="sr-only" for="timeline-slider">Illustrative robot decision</label><input id="timeline-slider" type="range" min="0" max="120" value="65" step="1" aria-describedby="gate-rule"><output class="frame-readout" id="frame-readout" for="timeline-slider">065 / 120</output></div>
+        <div class="controls" aria-label="SteerAct measured timeline playback">
+          <button class="play-button" id="play-button" type="button" aria-label="Play measured timeline" aria-pressed="false"><svg class="play-icon" viewBox="0 0 12 12" aria-hidden="true"><path id="play-symbol" d="M2 1L11 6 2 11Z"/></svg><span id="play-text">Play</span></button>
+          <button class="replay" id="replay-button" type="button" aria-label="Reset measured timeline to the beginning" title="Reset to the beginning"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 6a7 7 0 1 1-1 7M4 2v5h5"/></svg></button>
+          <div class="slider-wrap"><label class="sr-only" for="timeline-slider">Measured rollout timestep</label><input id="timeline-slider" type="range" min="0" max="120" value="65" step="1" aria-describedby="gate-rule"><output class="frame-readout" id="frame-readout" for="timeline-slider">650 / 1200</output></div>
           <p class="control-caption">SteerAct player<br>Feature + robot video</p>
         </div>
-        <p class="sync-status" id="sync-status" role="status" aria-live="polite">Controls the SteerAct curve and its linked video only. Footage and measured feature logs are pending.</p>
+        <p class="sync-status" id="sync-status" role="status" aria-live="polite">Controls the measured SteerAct curve and its linked Open Microwave video.</p>
         <div class="baseline-heading"><h3>Without steering</h3><p>Unsteered feature history + corresponding robot video</p></div>
         <div class="baseline-grid">
           <div class="chart-panel">
             <div class="chart-title"><h3>Unsteered · selected feature</h3><span>No intervention · α = 0</span></div>
-            <div class="baseline-chart-grid" role="img" aria-label="Illustrative unsteered feature history on the same decision axis. This is not a measured counterfactual.">
-              <div class="row-label">Feature intensity<small>Schematic units</small></div>
+            <div class="baseline-chart-grid" role="img" aria-label="Measured unsteered Open Microwave feature history on the same logged-timestep axis.">
+              <div class="row-label">Feature activation<small>Logged value</small></div>
               <div id="baseline-trace-container">
                 <svg class="trace-svg" viewBox="0 0 1000 150" preserveAspectRatio="none" aria-hidden="true">
                   <defs><clipPath id="baseline-history-clip"><rect id="baseline-history-window" x="0" y="0" width="542" height="150"/></clipPath></defs>
@@ -513,7 +513,7 @@
                   <path id="baseline-trace-history" class="trace-line baseline-line" d="" clip-path="url(#baseline-history-clip)"/>
                 </svg>
               </div>
-              <div></div><div class="axis"><span>0</span><span class="axis-label">Robot decision</span><span>120</span></div>
+              <div></div><div class="axis"><span>0</span><span class="axis-label">Logged timestep</span><span>1200</span></div>
               <div class="cursor-layer" aria-hidden="true"><div class="cursor" id="baseline-timeline-cursor" style="left:54.1667%"><span class="cursor-dot" id="baseline-feature-dot"></span></div></div>
             </div>
             <p class="timeline-note">Same feature scale; independent playback. No correction is applied.</p>
@@ -522,20 +522,20 @@
             <figcaption>Unsteered robot video <span>Linked to the timeline</span></figcaption>
             <div class="media-box linked-media" id="unsteered-media-box">
               <video id="unsteered-linked-video" playsinline muted preload="metadata" hidden aria-label="Unsteered robot video controlled by the Without steering player"></video>
-              <div class="linked-pending" id="unsteered-video-pending"><strong>Video pending</strong><small>Unsteered rollout footage</small></div>
+              <div class="linked-pending" id="unsteered-video-pending"><strong>Loading video</strong><small>Unsteered Open Microwave rollout</small></div>
             </div>
-            <p class="media-state" id="unsteered-media-status">No footage loaded. The feature trace is illustrative.</p>
-            <p class="media-time" id="unsteered-media-time">Unsteered decision 065 / 120</p>
+            <p class="media-state" id="unsteered-media-status">Loading the measured rollout footage.</p>
+            <p class="media-time" id="unsteered-media-time">Unsteered timestep 650 / 1200</p>
           </figure>
         </div>
-        <div class="controls" aria-label="Unsteered illustrative timeline playback">
-          <button class="play-button" id="baseline-play-button" type="button" aria-label="Play unsteered illustrative timeline" aria-pressed="false"><svg class="play-icon" viewBox="0 0 12 12" aria-hidden="true"><path id="baseline-play-symbol" d="M2 1L11 6 2 11Z"/></svg><span id="baseline-play-text">Play</span></button>
-          <button class="replay" id="baseline-replay-button" type="button" aria-label="Reset unsteered illustrative timeline to the beginning" title="Reset unsteered playback"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 6a7 7 0 1 1-1 7M4 2v5h5"/></svg></button>
-          <div class="slider-wrap"><label class="sr-only" for="baseline-timeline-slider">Unsteered robot decision</label><input id="baseline-timeline-slider" type="range" min="0" max="120" value="65" step="1" aria-describedby="baseline-sync-status"><output class="frame-readout" id="baseline-frame-readout" for="baseline-timeline-slider">065 / 120</output></div>
+        <div class="controls" aria-label="Unsteered measured timeline playback">
+          <button class="play-button" id="baseline-play-button" type="button" aria-label="Play unsteered measured timeline" aria-pressed="false"><svg class="play-icon" viewBox="0 0 12 12" aria-hidden="true"><path id="baseline-play-symbol" d="M2 1L11 6 2 11Z"/></svg><span id="baseline-play-text">Play</span></button>
+          <button class="replay" id="baseline-replay-button" type="button" aria-label="Reset unsteered measured timeline to the beginning" title="Reset unsteered playback"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 6a7 7 0 1 1-1 7M4 2v5h5"/></svg></button>
+          <div class="slider-wrap"><label class="sr-only" for="baseline-timeline-slider">Unsteered measured rollout timestep</label><input id="baseline-timeline-slider" type="range" min="0" max="120" value="65" step="1" aria-describedby="baseline-sync-status"><output class="frame-readout" id="baseline-frame-readout" for="baseline-timeline-slider">650 / 1200</output></div>
           <p class="control-caption">Unsteered player<br>Feature + robot video</p>
         </div>
-        <p class="sync-status" id="baseline-sync-status" role="status" aria-live="polite">Controls the unsteered curve and its linked video only. Footage and measured feature logs are pending.</p>
-        <p class="mechanism-caption" id="gate-rule"><strong>Both gates must be open to permit steering;</strong> bounded search may still select zero correction. Both curves are synthetic layout illustrations, not a measured steered/unsteered experiment. Video alignment uses explicit decision-to-video time mappings, not matched clip lengths.</p>
+        <p class="sync-status" id="baseline-sync-status" role="status" aria-live="polite">Controls the measured unsteered curve and its linked Open Microwave video.</p>
+        <p class="mechanism-caption" id="gate-rule"><strong>Both gates must be open to permit steering.</strong> Curves, gate states, and corrections come from the Open Microwave rollout log; 1201 logged timesteps are displayed as 121 samples. Each video is normalized independently to the shared timeline because the rollout clips have different durations.</p>
         <p class="sr-only" id="playback-announcement" role="status" aria-live="polite"></p>
         <p class="sr-only" id="baseline-playback-announcement" role="status" aria-live="polite"></p>
       </section>
@@ -660,22 +660,28 @@
     })();
   </script>
   <script id="demo-model">
-    // Deliberately synthetic, deterministic illustration. This is not the policy controller.
+    // Measured Open Microwave rollout, sampled every 10 source timesteps (0–1200).
     var SteerDemo = (() => {
       const maxIndex = 120;
-      const samples = Array.from({length:maxIndex + 1}, (_, index) => {
-        const maturity = (index >= 36 && index < 96) || index >= 106;
-        const outcome = maturity && ((index >= 56 && index < 81) || (index >= 88 && index < 96) || index >= 114);
-        const permitted = maturity && outcome;
-        const feature = Math.max(0.04, Math.min(0.94, 0.2 + 0.38 / (1 + Math.exp(-(index - 48) / 8)) + 0.1 * Math.sin(index / 8) + 0.04 * Math.sin(index * 1.3)));
-        const alpha = permitted && index % 11 !== 0 ? Math.round(0.06 * Math.sin((index - 56) / 7) * 1000) / 1000 : 0;
-        return Object.freeze({index, feature, maturity, outcome, permitted, alpha});
+      const steered = [1.243501,1.069619,0.824565,0.554819,0.288112,0.071051,-0.046448,-0.082098,-0.086537,-0.083559,-0.080789,-0.083673,-0.094425,-0.111296,-0.130505,-0.146419,-0.152473,-0.146002,-0.130116,-0.109855,-0.090358,-0.076315,-0.069798,-0.068905,-0.069708,-0.068691,-0.064573,-0.142986,-0.098413,-0.055877,-0.01905,0.011152,0.03646,0.059218,0.081447,0.104163,0.126408,0.145338,0.157439,0.159797,0.151386,0.133395,0.108316,0.080103,0.053683,0.032203,0.015742,0.002946,-0.007889,-0.018208,-0.027982,-0.036331,-0.041913,-0.042783,-0.037675,-0.026761,-0.010957,0.008785,0.031129,0.054627,0.078151,0.10084,0.122094,0.141502,0.158668,0.173209,0.18493,0.193932,0.200563,0.205201,0.20799,0.208737,0.206861,0.201486,0.191837,0.177729,0.159804,0.139565,0.1192,0.101127,0.087406,0.079209,0.076565,0.078484,0.083346,0.089329,0.095028,0.100004,0.104789,0.110557,0.118753,0.130558,0.146267,0.165094,0.185364,0.204865,0.221331,0.23302,0.2391,0.239734,0.235942,0.229277,0.221398,0.213661,0.20682,0.200925,0.195435,0.189451,0.182018,0.172494,0.160837,0.147717,0.134456,0.122784,0.11446,0.110839,0.112529,0.119213,0.129699,0.142202,0.154786];
+      const baseline = [1.243501,1.069619,0.824565,0.554819,0.288112,0.071051,-0.046448,-0.082098,-0.086537,-0.083559,-0.080789,-0.083673,-0.094425,-0.111296,-0.130505,-0.146419,-0.152473,-0.146002,-0.130116,-0.109855,-0.090358,-0.076315,-0.069798,-0.068905,-0.069708,-0.068691,-0.064573,-0.058392,-0.052028,-0.048307,-0.050289,-0.058735,-0.07144,-0.085387,-0.097477,-0.104741,-0.106202,-0.103742,-0.100615,-0.099851,-0.103512,-0.112119,-0.124638,-0.137691,-0.146389,-0.147978,-0.142947,-0.133612,-0.123657,-0.117653,-0.118067,-0.123666,-0.130422,-0.133887,-0.132058,-0.125827,-0.118132,-0.113306,-0.115394,-0.125573,-0.141648,-0.159484,-0.174342,-0.182422,-0.182585,-0.176783,-0.168786,-0.162385,-0.159702,-0.160543,-0.16274,-0.162907,-0.1581,-0.147663,-0.133548,-0.119209,-0.108618,-0.104913,-0.108911,-0.118692,-0.130448,-0.140149,-0.145152,-0.144793,-0.140381,-0.135573,-0.134565,-0.139123,-0.148359,-0.15991,-0.169858,-0.173863,-0.170341,-0.160992,-0.149089,-0.138309,-0.131724,-0.129907,-0.130606,-0.130281,-0.125984,-0.116764,-0.10428,-0.092307,-0.085386,-0.086857,-0.096824,-0.112227,-0.128553,-0.141428,-0.148116,-0.148768,-0.14622,-0.144324,-0.146178,-0.152796,-0.162523,-0.171642,-0.176095,-0.173262,-0.16303];
+      const corrections = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.85,0.85,0.85,0.85,0.85,0.85,0.85,0.85,0.85,0.85,0.85,1.75,1.75,1.75,1.75,1.75,1.75,1.75,1.75,1.75,1.75,1.75,1.3,1.3,1.3,1.3,1.3,1.3,1.3,1.3,1.3,1.3,1.3,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05];
+      const maturityStates = '0000000000000000111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111';
+      const outcomeStates = '0000000000000000000000000001111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111';
+      const samples = steered.map((feature,index) => {
+        const maturity = maturityStates[index] === '1';
+        const outcome = outcomeStates[index] === '1';
+        return Object.freeze({index,timestep:index*10,feature,maturity,outcome,permitted:maturity&&outcome,alpha:corrections[index]});
       });
       const stateAt = index => samples[Math.min(maxIndex, Math.max(0, Math.floor(Number.isFinite(index) ? index : 0)))];
       const nextIndex = (index, elapsedMs, speed = 1) => Math.min(maxIndex, Math.max(0, index) + Math.max(0, Number.isFinite(elapsedMs) ? elapsedMs : 0) * 0.005 * (Number.isFinite(speed) ? Math.max(0,speed) : 1));
-      const baselineSamples = Array.from({length:maxIndex+1},(_,index)=>Object.freeze({index,feature:Math.max(0.04,Math.min(0.94,0.23+0.28/(1+Math.exp(-(index-45)/9))+0.12*Math.sin(index/10)+0.055*Math.sin(index*0.85))),alpha:0}));
+      const baselineSamples = baseline.map((feature,index)=>Object.freeze({index,timestep:index*10,feature,alpha:0}));
       const baselineAt = index => baselineSamples[Math.min(maxIndex,Math.max(0,Math.floor(Number.isFinite(index)?index:0)))];
-      return Object.freeze({samples, stateAt, nextIndex, maxIndex,baselineSamples,baselineAt});
+      const values = steered.concat(baseline), valueMin=Math.min(...values), valueMax=Math.max(...values);
+      const valuePadding=(valueMax-valueMin)*0.06;
+      const yFor = value => 140-(value-(valueMin-valuePadding))/(valueMax-valueMin+2*valuePadding)*130;
+      const alphaMax=Math.max(...corrections.map(Math.abs));
+      return Object.freeze({samples,stateAt,nextIndex,maxIndex,baselineSamples,baselineAt,yFor,alphaMax});
     })();
   </script>
   <script id="sync-model">
@@ -703,7 +709,7 @@
             pause();onError('Video is not ready or its timing is invalid. Wait for loading, then press Play.');return false;
           }
           if(clips.some(e=>e.timing.offsetSeconds+clampIndex(index)*e.timing.secondsPerDecision>=e.video.duration)){
-            pause();onError('This decision is outside a linked clip’s playable range. Reset or seek to an earlier decision.');return false;
+            pause();onError('This sample is outside a linked clip’s playable range. Reset or seek to an earlier timestep.');return false;
           }
           seek(index);
           try {
@@ -722,7 +728,7 @@
       }
       return {targetTime,indexFromTime,createTransport};
     })();
-    // The clips are aligned across the 0–120 illustrative decision range. The feature histories remain synthetic.
+    // Each measured clip is normalized across the 0–120 display-sample range.
     var SteerMedia = {
       steered:{src:'assets/videos/mechanism-steering.mp4',offsetSeconds:0,secondsPerDecision:0.37},
       unsteered:{src:'assets/videos/mechanism-baseline.mp4',offsetSeconds:0,secondsPerDecision:0.999}
@@ -733,10 +739,10 @@
       const byId = id => document.getElementById(id);
       const svgNS = 'http://www.w3.org/2000/svg';
       const model = SteerDemo;
-      const path = model.samples.map(s => `${s.index ? 'L' : 'M'}${(s.index / model.maxIndex * 1000).toFixed(2)},${(140 - s.feature * 125).toFixed(2)}`).join(' ');
+      const path = model.samples.map(s => `${s.index ? 'L' : 'M'}${(s.index / model.maxIndex * 1000).toFixed(2)},${model.yFor(s.feature).toFixed(2)}`).join(' ');
       byId('trace-context').setAttribute('d',path);
       byId('trace-history').setAttribute('d',path);
-      const baselinePath=model.baselineSamples.map(s=>`${s.index?'L':'M'}${(s.index/model.maxIndex*1000).toFixed(2)},${(140-s.feature*125).toFixed(2)}`).join(' ');
+      const baselinePath=model.baselineSamples.map(s=>`${s.index?'L':'M'}${(s.index/model.maxIndex*1000).toFixed(2)},${model.yFor(s.feature).toFixed(2)}`).join(' ');
       byId('baseline-trace-context').setAttribute('d',baselinePath);
       byId('baseline-trace-history').setAttribute('d',baselinePath);
       function drawGate(id, key) {
@@ -760,7 +766,7 @@
       for (const s of model.samples) {
         if (s.alpha === 0) continue;
         const rect = document.createElementNS(svgNS,'rect');
-        const height = Math.abs(s.alpha) / 0.06 * 29;
+        const height = Math.abs(s.alpha) / model.alphaMax * 29;
         rect.setAttribute('x',Math.min(994,s.index / model.maxIndex * 1000));
         rect.setAttribute('y',s.alpha > 0 ? 35 - height : 35);
         rect.setAttribute('width','5.8');
@@ -791,14 +797,14 @@
           });
           video.addEventListener('error',()=>{
             entry.failed=true;pause(false);video.hidden=true;byId(side+'-video-pending').hidden=false;
-            byId(side+'-media-status').textContent='Video unavailable. The illustrative trace remains usable.';
-            status(label+' video could not load. Press Play to continue with its illustrative curve.');
+            byId(side+'-media-status').textContent='Video unavailable. The measured trace remains usable.';
+            status(label+' video could not load. Press Play to continue with its measured curve.');
           });
           video.addEventListener('waiting',()=>{
             if(playing){pause(false);status(label+' playback paused while its video buffers. Press Play when ready.');}
           });
           video.addEventListener('ended',()=>{
-            if(playing||starting){reachedClipEnd=true;pause(false);status(label+' video has ended. Replay starts this player at decision zero.');}
+            if(playing||starting){reachedClipEnd=true;pause(false);status(label+' video has ended. Replay starts this player at timestep zero.');}
           });
           video.src=timing.src;
         }
@@ -807,10 +813,10 @@
           const s=sampleAt(index), percent=s.index/model.maxIndex*100;
           control('timeline-cursor').style.left=percent+'%';
           control('history-window').setAttribute('width',percent*10);
-          control('feature-dot').style.top=(140-s.feature*125)/150*traceContainer.clientHeight+'px';
-          byId(side+'-media-time').textContent=label+' decision '+String(s.index).padStart(3,'0')+' / 120';
+          control('feature-dot').style.top=model.yFor(s.feature)/150*traceContainer.clientHeight+'px';
+          byId(side+'-media-time').textContent=label+' timestep '+String(s.timestep).padStart(4,'0')+' / 1200';
           if(!baseline) {
-            byId('step-label').textContent='STEP '+String(s.index).padStart(3,'0');
+            byId('step-label').textContent='STEP '+String(s.timestep).padStart(4,'0');
             for(const [id,open,on,off] of [
               ['maturity-value',s.maturity,'Ready','Not ready'],
               ['outcome-value',s.outcome,'Open','Closed'],
@@ -824,27 +830,27 @@
             byId('state-message').textContent=!s.maturity
               ?'History support is not ready. Steering remains off.'
               :!s.outcome?'History support is ready, but the outcome gate is closed.'
-              :s.alpha===0?'Both gates are open; this illustrative sample has zero correction.'
-              :'A signed correction is shown along the selected decoder direction.';
+              :s.alpha===0?'Both gates are open; the logged correction is zero.'
+              :'The logged signed correction is applied along the selected decoder direction.';
           }
           slider.value=String(s.index);
           slider.style.background='linear-gradient(to right,'+(baseline?'var(--clay)':'var(--teal)')+' '+percent+'%,#dce3dd '+percent+'%)';
-          slider.setAttribute('aria-valuetext',label+' decision '+s.index+' of 120. '+(baseline?'No intervention.':'Maturity '+(s.maturity?'ready':'not ready')+', outcome gate '+(s.outcome?'open':'closed')+', correction '+s.alpha.toFixed(3)+'.')+' Illustrative data.');
-          control('frame-readout').textContent=String(s.index).padStart(3,'0')+' / 120';
+          slider.setAttribute('aria-valuetext',label+' logged timestep '+s.timestep+' of 1200. '+(baseline?'No intervention.':'Maturity '+(s.maturity?'ready':'not ready')+', outcome gate '+(s.outcome?'open':'closed')+', correction '+s.alpha.toFixed(3)+'.')+' Measured rollout data.');
+          control('frame-readout').textContent=String(s.timestep).padStart(4,'0')+' / 1200';
         }
         function updateButton() {
           const action=starting?'Cancel':playing?'Pause':index>=model.maxIndex||reachedClipEnd?'Replay':'Play';
           control('play-text').textContent=action;
           control('play-symbol').setAttribute('d',playing?'M2 1H5V11H2ZM8 1H11V11H8Z':'M2 1L11 6 2 11Z');
-          button.setAttribute('aria-label',action+' '+label+' illustrative timeline');
+          button.setAttribute('aria-label',action+' '+label+' measured timeline');
           button.setAttribute('aria-pressed',String(playing));
         }
         function pause(announce=true) {
           playing=false;starting=false;startRequest++;transport.pause();
           if(frameId!==null)cancelAnimationFrame(frameId);
           frameId=null;lastTime=null;updateButton();
-          status(label+' paused at decision '+sampleAt(index).index+'. Only this curve and its linked video are controlled here.');
-          if(announce)control('playback-announcement').textContent=label+' illustration paused at decision '+sampleAt(index).index+'.';
+          status(label+' paused at timestep '+sampleAt(index).timestep+'. Only this curve and its linked video are controlled here.');
+          if(announce)control('playback-announcement').textContent=label+' rollout paused at timestep '+sampleAt(index).timestep+'.';
         }
         function tick(time) {
           if(!playing)return;
@@ -854,8 +860,8 @@
           lastTime=time;transport.sync(index);render();
           if(index>=model.maxIndex) {
             pause(false);
-            control('playback-announcement').textContent=label+' illustrative playback complete.';
-            status(label+' playback complete. Replay starts this player at decision zero.');
+            control('playback-announcement').textContent=label+' measured playback complete.';
+            status(label+' playback complete. Replay starts this player at timestep zero.');
             return;
           }
           frameId=requestAnimationFrame(tick);
@@ -870,18 +876,18 @@
           starting=false;
           if(!started){updateButton();return;}
           playing=true;lastTime=null;render();updateButton();
-          control('playback-announcement').textContent='Playing the '+label+' illustrative timeline.';
-          status(mediaEntries.some(e=>!e.failed)?label+' curve and linked video are playing. The curve remains illustrative until measured logs are supplied.':label+' illustrative curve is playing. Robot video pending.');
+          control('playback-announcement').textContent='Playing the '+label+' measured timeline.';
+          status(mediaEntries.some(e=>!e.failed)?label+' measured curve and linked video are playing.':label+' measured curve is playing. Robot video unavailable.');
           frameId=requestAnimationFrame(tick);
         });
         control('replay-button').addEventListener('click',()=>{
           pause(false);index=0;reachedClipEnd=false;transport.seek(index);render();updateButton();
-          control('playback-announcement').textContent=label+' illustration reset to decision zero.';
-          status(label+' reset to decision zero. The other player is unchanged.');
+          control('playback-announcement').textContent=label+' rollout reset to timestep zero.';
+          status(label+' reset to timestep zero. The other player is unchanged.');
         });
         slider.addEventListener('input',()=>{
           pause(false);index=Number(slider.value);reachedClipEnd=false;transport.seek(index);render();updateButton();
-          status(label+' paused at decision '+sampleAt(index).index+'. Its curve and linked video are aligned.');
+          status(label+' paused at timestep '+sampleAt(index).timestep+'. Its curve and linked video are aligned.');
         });
         document.addEventListener('visibilitychange',()=>{if(document.hidden&&(playing||starting))pause();});
         window.addEventListener('resize',render);
