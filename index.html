@@ -90,7 +90,7 @@
     .track { height:13px; position:relative; background:#e9edeb; border-radius:2px; overflow:hidden; }
     .segment { position:absolute; height:100%; top:0; background:#62aaa0; }
     .track.outcome .segment { background:var(--teal); }
-    .track::after { content:''; position:absolute; z-index:2; top:0; bottom:0; left:var(--progress,54.1667%); right:0; background:#e9edeb; }
+    .track::after { content:''; position:absolute; z-index:2; top:0; bottom:0; left:var(--progress,58.3333%); right:0; background:#e9edeb; }
     .correction-container { height:70px; }
     .axis { display:flex; justify-content:space-between; font-size:12px; color:#69736f; position:relative; }
     .axis-label { position:absolute; inset:0; text-align:center; pointer-events:none; }
@@ -119,7 +119,7 @@
     .replay { border:1px solid var(--line); background:transparent; color:#52645a; display:flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:4px; }
     .replay:hover { background:var(--quiet); }
     .slider-wrap { display:flex; align-items:center; gap:14px; min-width:0; }
-    input[type="range"] { -webkit-appearance:none; appearance:none; width:100%; height:5px; border-radius:3px; background:linear-gradient(to right,var(--teal) 54.16%,#dce3dd 54.16%); cursor:pointer; margin:18px 0; }
+    input[type="range"] { -webkit-appearance:none; appearance:none; width:100%; height:5px; border-radius:3px; background:linear-gradient(to right,var(--teal) 58.3333%,#dce3dd 58.3333%); cursor:pointer; margin:18px 0; }
     input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:var(--teal); border:3px solid var(--paper); box-shadow:0 0 0 1px var(--teal); }
     input[type="range"]::-moz-range-thumb { width:11px; height:11px; border-radius:50%; background:var(--teal); border:3px solid var(--paper); box-shadow:0 0 0 1px var(--teal); }
     .frame-readout { font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; }
@@ -554,7 +554,7 @@
               <div class="row-label">Feature activation<small>Logged value</small></div>
               <div class="trace-container">
                 <svg class="trace-svg" viewBox="0 0 1000 150" preserveAspectRatio="none" aria-hidden="true">
-                  <defs><clipPath id="history-clip"><rect id="history-window" x="0" y="0" width="542" height="150"/></clipPath></defs>
+                  <defs><clipPath id="history-clip"><rect id="history-window" x="0" y="0" width="583.3333" height="150"/></clipPath></defs>
                   <path class="grid-line" d="M0 35H1000M0 80H1000M0 125H1000"/>
                   <path id="reference-band-context" class="reference-band trace-full" d=""/>
                   <path id="reference-trace-context" class="trace-line reference-line trace-full" d=""/>
@@ -569,9 +569,9 @@
               <div class="row-label">Maturity support</div><div class="track" id="maturity-track"></div>
               <div class="row-label">Outcome gate</div><div class="track outcome" id="outcome-track"></div>
               <div class="row-label">Signed correction</div>
-              <div class="correction-container"><svg class="correction-svg" viewBox="0 0 1000 70" preserveAspectRatio="none" aria-hidden="true"><defs><clipPath id="correction-clip"><rect id="correction-window" x="0" y="0" width="542" height="70"/></clipPath></defs><path d="M0 35H1000" stroke="#b8c3bd" stroke-width="1" vector-effect="non-scaling-stroke"/><g id="correction-bars" clip-path="url(#correction-clip)"></g></svg></div>
+              <div class="correction-container"><svg class="correction-svg" viewBox="0 0 1000 70" preserveAspectRatio="none" aria-hidden="true"><defs><clipPath id="correction-clip"><rect id="correction-window" x="0" y="0" width="583.3333" height="70"/></clipPath></defs><path d="M0 35H1000" stroke="#b8c3bd" stroke-width="1" vector-effect="non-scaling-stroke"/><g id="correction-bars" clip-path="url(#correction-clip)"></g></svg></div>
               <div></div><div class="axis"><span>0</span><span class="axis-label">Logged timestep</span><span>1200</span></div>
-              <div class="cursor-layer" aria-hidden="true"><div class="cursor" id="timeline-cursor" style="left:54.1667%"><span class="cursor-dot" id="feature-dot"></span></div></div>
+              <div class="cursor-layer" aria-hidden="true"><div class="cursor" id="timeline-cursor" style="left:58.3333%"><span class="cursor-dot" id="feature-dot"></span></div></div>
             </div>
           </div>
           <figure class="linked-video baseline">
@@ -581,7 +581,7 @@
               <div class="linked-pending" id="unsteered-video-pending"><strong>Loading video</strong><small>Unsteered Open Microwave rollout</small></div>
             </div>
             <p class="media-state" id="unsteered-media-status">Loading the measured rollout footage.</p>
-            <p class="media-time" id="unsteered-media-time">Unsteered timestep 0650 / 1200</p>
+            <p class="media-time" id="unsteered-media-time">Unsteered timestep 0700 / 1200</p>
           </figure>
           <figure class="linked-video ours">
             <figcaption>SteerAct <span>Open Microwave</span></figcaption>
@@ -590,13 +590,13 @@
               <div class="linked-pending" id="steered-video-pending"><strong>Loading video</strong><small>Steered Open Microwave rollout</small></div>
             </div>
             <p class="media-state" id="steered-media-status">Loading the measured rollout footage.</p>
-            <p class="media-time" id="steered-media-time">SteerAct timestep 0650 / 1200</p>
+            <p class="media-time" id="steered-media-time">SteerAct timestep 0700 / 1200</p>
           </figure>
         </div>
         <div class="controls" aria-label="Shared measured timeline playback">
           <button class="play-button" id="play-button" type="button" aria-label="Play measured timeline" aria-pressed="false"><svg class="play-icon" viewBox="0 0 12 12" aria-hidden="true"><path id="play-symbol" d="M2 1L11 6 2 11Z"/></svg><span id="play-text">Play</span></button>
-          <button class="replay" id="replay-button" type="button" aria-label="Reset measured timeline to the beginning" title="Reset to the beginning"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 6a7 7 0 1 1-1 7M4 2v5h5"/></svg></button>
-          <div class="slider-wrap"><label class="sr-only" for="timeline-slider">Measured rollout timestep</label><input id="timeline-slider" type="range" min="0" max="120" value="65" step="1"><output class="frame-readout" id="frame-readout" for="timeline-slider">0650 / 1200</output></div>
+          <button class="replay" id="replay-button" type="button" aria-label="Reset measured timeline to timestep 700" title="Reset to timestep 700"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 6a7 7 0 1 1-1 7M4 2v5h5"/></svg></button>
+          <div class="slider-wrap"><label class="sr-only" for="timeline-slider">Measured rollout timestep</label><input id="timeline-slider" type="range" min="0" max="120" value="70" step="1"><output class="frame-readout" id="frame-readout" for="timeline-slider">0700 / 1200</output></div>
           <p class="control-caption">Shared timeline<br>Both rollouts</p>
         </div>
         <p class="sr-only" id="sync-status" role="status" aria-live="polite"></p>
@@ -802,7 +802,7 @@
   <script id="demo-model">
     // Measured Open Microwave rollout, sampled every 10 source timesteps (0–1200).
     var SteerDemo = (() => {
-      const maxIndex = 120;
+      const maxIndex = 120, initialIndex = 70;
       const recordedSteered = [1.243501,1.069619,0.824565,0.554819,0.288112,0.071051,-0.046448,-0.082098,-0.086537,-0.083559,-0.080789,-0.083673,-0.094425,-0.111296,-0.130505,-0.146419,-0.152473,-0.146002,-0.130116,-0.109855,-0.090358,-0.076315,-0.069798,-0.068905,-0.069708,-0.068691,-0.064573,-0.142986,-0.098413,-0.055877,-0.01905,0.011152,0.03646,0.059218,0.081447,0.104163,0.126408,0.145338,0.157439,0.159797,0.151386,0.133395,0.108316,0.080103,0.053683,0.032203,0.015742,0.002946,-0.007889,-0.018208,-0.027982,-0.036331,-0.041913,-0.042783,-0.037675,-0.026761,-0.010957,0.008785,0.031129,0.054627,0.078151,0.10084,0.122094,0.141502,0.158668,0.173209,0.18493,0.193932,0.200563,0.205201,0.20799,0.208737,0.206861,0.201486,0.191837,0.177729,0.159804,0.139565,0.1192,0.101127,0.087406,0.079209,0.076565,0.078484,0.083346,0.089329,0.095028,0.100004,0.104789,0.110557,0.118753,0.130558,0.146267,0.165094,0.185364,0.204865,0.221331,0.23302,0.2391,0.239734,0.235942,0.229277,0.221398,0.213661,0.20682,0.200925,0.195435,0.189451,0.182018,0.172494,0.160837,0.147717,0.134456,0.122784,0.11446,0.110839,0.112529,0.119213,0.129699,0.142202,0.154786];
       const baseline = [1.243501,1.069619,0.824565,0.554819,0.288112,0.071051,-0.046448,-0.082098,-0.086537,-0.083559,-0.080789,-0.083673,-0.094425,-0.111296,-0.130505,-0.146419,-0.152473,-0.146002,-0.130116,-0.109855,-0.090358,-0.076315,-0.069798,-0.068905,-0.069708,-0.068691,-0.064573,-0.058392,-0.052028,-0.048307,-0.050289,-0.058735,-0.07144,-0.085387,-0.097477,-0.104741,-0.106202,-0.103742,-0.100615,-0.099851,-0.103512,-0.112119,-0.124638,-0.137691,-0.146389,-0.147978,-0.142947,-0.133612,-0.123657,-0.117653,-0.118067,-0.123666,-0.130422,-0.133887,-0.132058,-0.125827,-0.118132,-0.113306,-0.115394,-0.125573,-0.141648,-0.159484,-0.174342,-0.182422,-0.182585,-0.176783,-0.168786,-0.162385,-0.159702,-0.160543,-0.16274,-0.162907,-0.1581,-0.147663,-0.133548,-0.119209,-0.108618,-0.104913,-0.108911,-0.118692,-0.130448,-0.140149,-0.145152,-0.144793,-0.140381,-0.135573,-0.134565,-0.139123,-0.148359,-0.15991,-0.169858,-0.173863,-0.170341,-0.160992,-0.149089,-0.138309,-0.131724,-0.129907,-0.130606,-0.130281,-0.125984,-0.116764,-0.10428,-0.092307,-0.085386,-0.086857,-0.096824,-0.112227,-0.128553,-0.141428,-0.148116,-0.148768,-0.14622,-0.144324,-0.146178,-0.152796,-0.162523,-0.171642,-0.176095,-0.173262,-0.16303];
       const corrections = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.85,0.85,0.85,0.85,0.85,0.85,0.85,0.85,0.85,0.85,0.85,1.75,1.75,1.75,1.75,1.75,1.75,1.75,1.75,1.75,1.75,1.75,1.3,1.3,1.3,1.3,1.3,1.3,1.3,1.3,1.3,1.3,1.3,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-0.7,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05,-1.05];
@@ -852,7 +852,7 @@
       const valuePadding=(valueMax-valueMin)*0.06;
       const yFor = value => 140-(value-(valueMin-valuePadding))/(valueMax-valueMin+2*valuePadding)*130;
       const alphaMax=Math.max(...corrections.map(Math.abs));
-      return Object.freeze({samples,stateAt,nextIndex,maxIndex,baselineSamples,baselineAt,referenceSamples,yFor,alphaMax});
+      return Object.freeze({samples,stateAt,nextIndex,maxIndex,initialIndex,baselineSamples,baselineAt,referenceSamples,yFor,alphaMax});
     })();
   </script>
   <script id="sync-model">
@@ -862,7 +862,7 @@
       const targetTime=(index,timing,duration)=>!valid(timing)||!Number.isFinite(duration)||duration<=0?null:Math.min(duration,timing.offsetSeconds+clampIndex(index)*timing.secondsPerDecision);
       const indexFromTime=(time,timing)=>valid(timing)&&Number.isFinite(time)?clampIndex((time-timing.offsetSeconds)/timing.secondsPerDecision):0;
       function createTransport(entries,onError=()=>{}) {
-        let generation=0,wantsPlay=false,currentIndex=65;
+        let generation=0,wantsPlay=false,currentIndex=SteerDemo.initialIndex;
         const active=()=>entries.filter(e=>!e.failed);
         function pause(){wantsPlay=false;generation++;for(const e of entries)e.video.pause();}
         function seek(index,force=true){
@@ -975,7 +975,7 @@
         const traceContainer = document.querySelector('.trace-container');
         const sampleAt = model.stateAt;
         const mediaEntries = ['unsteered','steered'].map(side=>({side,video:byId(side+'-linked-video'),timing:SteerMedia[side],failed:false}));
-        let index=65,playing=false,starting=false,frameId=null,lastTime=null,reachedClipEnd=false,startRequest=0;
+        let index=model.initialIndex,playing=false,starting=false,frameId=null,lastTime=null,reachedClipEnd=false,startRequest=0;
         const status = message => {byId('sync-status').textContent=message;};
         const transport = SteerSync.createTransport(mediaEntries,status);
 
@@ -1046,7 +1046,7 @@
         }
         button.addEventListener('click',async()=>{
           if(playing||starting){pause();return;}
-          if(index>=model.maxIndex||reachedClipEnd)index=0;
+          if(index>=model.maxIndex||reachedClipEnd)index=model.initialIndex;
           reachedClipEnd=false;starting=true;updateButton();render();
           const request=++startRequest;
           const started=await transport.play(index);
@@ -1059,9 +1059,9 @@
           frameId=requestAnimationFrame(tick);
         });
         byId('replay-button').addEventListener('click',()=>{
-          pause(false);index=0;reachedClipEnd=false;transport.seek(index);render();updateButton();
-          byId('playback-announcement').textContent='Both rollouts reset to timestep zero.';
-          status('Reset to timestep zero.');
+          pause(false);index=model.initialIndex;reachedClipEnd=false;transport.seek(index);render();updateButton();
+          byId('playback-announcement').textContent='Both rollouts reset to timestep '+sampleAt(index).timestep+'.';
+          status('Reset to timestep '+sampleAt(index).timestep+'.');
         });
         slider.addEventListener('input',()=>{
           pause(false);index=Number(slider.value);reachedClipEnd=false;transport.seek(index);render();updateButton();
